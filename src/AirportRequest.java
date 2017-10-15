@@ -14,6 +14,7 @@ public class AirportRequest implements Request{
 
     public AirportRequest() {
         airportHashMap = new HashMap<>();
+        readData();
     }
 
     public void readData() {
@@ -46,6 +47,14 @@ public class AirportRequest implements Request{
 
     @Override
     public ArrayList<String> doRequest(String[] params) {
-        return null;
+        ArrayList<String> result = new ArrayList<>();
+
+        if (airportHashMap.containsKey(params)) {
+            result.add(airportHashMap.get(params).displayAirportInfo());
+        } else {
+            result.add("error,unknown airport");
+        }
+
+        return result;
     }
 }
