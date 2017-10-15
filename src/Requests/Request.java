@@ -1,3 +1,5 @@
+package Requests;
+
 import java.util.ArrayList;
 
 public interface Request {

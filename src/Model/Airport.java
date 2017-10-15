@@ -1,3 +1,5 @@
+package Model;
+
 import java.util.Queue;
 
 public class Airport {

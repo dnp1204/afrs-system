@@ -1,3 +1,5 @@
+package Model;
+
 public class WeatherInformation {
     private String condition;
     private String temperature;

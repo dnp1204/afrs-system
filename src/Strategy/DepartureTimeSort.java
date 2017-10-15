@@ -1,3 +1,7 @@
+package Strategy;
+
+import Model.Itinerary;
+
 import java.util.ArrayList;
 
 public class DepartureTimeSort implements ItinerarySort {

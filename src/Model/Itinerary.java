@@ -1,6 +1,8 @@
+package Model;
+
 import java.util.Date;
 
-public class Flight implements FlightComponent {
+public class Itinerary implements FlightComponent {
     @Override
     public int getAirfare() {
         return 0;

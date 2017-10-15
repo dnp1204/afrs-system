@@ -1,10 +1,16 @@
+package Requests;
+
+import Model.Airport;
+import Model.WeatherInformation;
+import Requests.Request;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class AirportRequest implements Request{
+public class AirportRequest implements Request {
 
     private final String DIR = "/Data/";
     private final String AIRPORTSCODE = "airports.txt";
