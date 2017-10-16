@@ -14,6 +14,10 @@ public class ReserveRequest implements Request {
 
     @Override
     public ArrayList<String> doRequest(String[] params) {
+        //params should be reserve,id,passenger
+        int id = Integer.parseInt(params[1]);
+        String passenger = params[2];
+        ReservationDatabase.reserve(id, passenger);
         return null;
     }
 }
