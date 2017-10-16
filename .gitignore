@@ -9,7 +9,7 @@ out/
 *.xml
 
 #jack added this
-.idea/workspace.xml
+.idea
 
 # Log file
 *.log
