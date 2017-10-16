@@ -37,6 +37,12 @@ public class RequestController {
             params[i-1] = requestAndParams[i];
         }
 
+        if(requests.get(request) == null) {
+            ArrayList<String> response = new ArrayList<>();
+            response.add("error,unknown request");
+            return response;
+        }
+
         return requests.get(request).doRequest(params);
     }
 

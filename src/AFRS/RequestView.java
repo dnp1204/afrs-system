@@ -32,7 +32,7 @@ public class RequestView {
             if (response.get(0).equals("quit")) {
                 System.exit(0);
             }
-
+            printResponse(response);
         } while(!response.get(0).equals("quit"));
     }
 
