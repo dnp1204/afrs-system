@@ -1,11 +1,12 @@
 package AFRS.Model;
 
+import java.time.LocalTime;
 import java.util.Date;
 
 public interface FlightComponent {
     int getAirfare();
-    Date getDepartureTime();
-    Date getArrivalTime();
+    LocalTime getDepartureTime();
+    LocalTime getArrivalTime();
     String getOrigin();
     String getDestination();
 }
