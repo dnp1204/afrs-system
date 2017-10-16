@@ -23,7 +23,7 @@ public class RequestController {
 
     public ArrayList<String> parse(String str) {
         String input = str.substring(0, str.length() - 1);
-        String[] requestAndParams = input.split(",");
+        String[] requestAndParams = safeSplit(input);
         String request = requestAndParams[0];
         if(request.equals("quit")) {
             reservationDB.shutDown();
@@ -44,6 +44,17 @@ public class RequestController {
         }
 
         return requests.get(request).doRequest(params);
+    }
+
+    private String[] safeSplit(String input) {
+        String[] initArray = input.split(",");
+        for (String s:
+             initArray) {
+            if(s == null)
+                s = "";
+        }
+
+        return initArray;
     }
 
 }
