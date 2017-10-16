@@ -46,6 +46,6 @@ public class Airport {
     }
 
     public String displayAirportInfo() {
-        return "airport," + name + ',' + displayCurrentWeather();
+        return "airport," + name + ',' + displayCurrentWeather() + ',' + delay;
     }
 }

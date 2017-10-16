@@ -14,6 +14,7 @@ public class AirportRequest implements Request {
     private final String DIR = "/AFRS/Data/";
     private final String AIRPORTSCODE = "airports.txt";
     private final String WEATHERINFO = "weather.txt";
+    private final String DELAYS = "delays.txt";
 
     private HashMap<String, Airport> airportHashMap;
 
@@ -56,10 +57,19 @@ public class AirportRequest implements Request {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    public HashMap<String, Airport> getAirportHashMap() {
-        return airportHashMap;
+        // Read delays time
+        br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(DIR + DELAYS)));
+        try {
+            line = br.readLine();
+            while (line != null) {
+                String[] airport = line.split(",");
+                airportHashMap.get(airport[0]).setDelay(Integer.parseInt(airport[1]));
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
