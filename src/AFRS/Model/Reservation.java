@@ -34,4 +34,12 @@ public class Reservation implements Comparable<Reservation> {
             //return compareage-this.studentage;
         }
 
+    @Override
+    public String toString(){
+        StringBuffer output = new StringBuffer();
+        output.append(this.getPassengerName());
+        output.append(this.getItinerary().toString());
+        return String.valueOf(output);
+    }
+
 }
