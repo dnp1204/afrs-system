@@ -6,6 +6,7 @@ out/
 
 #jack added this
 .idea/workspace.xml
+*.xml
 
 #jack added this
 .idea/workspace.xml
