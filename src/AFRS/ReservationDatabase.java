@@ -6,10 +6,7 @@ import com.sun.org.apache.regexp.internal.RE;
 import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -41,7 +38,7 @@ public class ReservationDatabase {
                 //then split passenger name and Itinerary string
                 new_reservation.setPassengerName(reservationInfo[0])
                 //call Itinerary constructor with string parameter
-                Itinerary new_itinerary_from_string = new Itinerary(reservationInfo[1]); //TODO: this
+                Itinerary new_itinerary_from_string = new Itinerary(reservationInfo[1]); //TODO: create a Itinerary constructor for String param
                 new_reservation.setItinerary(new_itinerary_from_string);
 
                 reservationList.add(new_reservation);
@@ -56,9 +53,16 @@ public class ReservationDatabase {
         }
     }
     //write to new txt file to save current db
-    private void shutDown() {
-        //write to a file new db CSV
-    }
+    private void shutDown() throws IOException{
+        StringBuffer output = new StringBuffer();
+        for ( Reservation r : reservationList){
+            output.append(r.toString());
+            output.append("/n");
+        }
+        BufferedWriter writer = new BufferedWriter(new FileWriter("ReservationDB.txt"));
+        writer.write(String.valueOf(output));
+        writer.close();
+        }
 
     //called by client to reserve an itinerary that was just queried
     //params: itinerary (Itinerary) - the itinerary to be reserved4
