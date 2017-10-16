@@ -1,5 +1,4 @@
 import Requests.AirportRequest;
-import Requests.InfoRequest;
 
 import java.util.ArrayList;
 
@@ -18,13 +17,5 @@ public class RequestView {
 
         ArrayList<String> result3 = airportRequest.doRequest(params);
         System.out.println(result3.get(0));
-
-        // Check info request
-        System.out.println("\nInfo Request");
-        InfoRequest infoRequest = new InfoRequest();
-        String[] infoParams = {"SFO", "LAS"};
-
-        ArrayList<String> result4 = infoRequest.doRequest(infoParams);
-        System.out.println(result4.get(0));
     }
 }
