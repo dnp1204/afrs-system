@@ -2,9 +2,6 @@ package AFRS;
 
 import AFRS.Model.Itinerary;
 import AFRS.Model.Reservation;
-import com.sun.org.apache.regexp.internal.RE;
-import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,13 +15,13 @@ public class ReservationDatabase {
 
 //- startUp() : void
 //- shutDown(): void
-//+ reserve(params) : void
-//+ delete(params) : void
-//+ retrieve(params) : reservation
-//+ updateInventoryList(ArrayList) : void
+//+ reserve(params) : String
+//+ delete(params) : String
+//+ retrieve(params) : ArrayList<Reservation>
+//+ updateItineraryList(ArrayList) : void
 
 
-    //try to creat a db from existing text file on start up
+    //try to create a db from existing text file on start up
     private void startUp(){
         try {
             //ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
@@ -67,7 +64,7 @@ public class ReservationDatabase {
     //called by client to reserve an itinerary that was just queried
     //params: itinerary (Itinerary) - the itinerary to be reserved4
 
-    private String reserve(int id, String passengerName) {
+    public String reserve(int id, String passengerName) {
 
         // check if id is valid
         // then check if this reservation already exists
@@ -138,10 +135,10 @@ public class ReservationDatabase {
 
     }
 
-    public ArrayList<Reservation> retrieve(String passenger, String destination){
-       //same as above
-        return;
-    }
+//    public ArrayList<Reservation> retrieve(String passenger, String destination){
+//       //same as above
+//        return;
+//    }
 
     public ArrayList<Reservation> retrieve(String passenger, String origin, String destination){
         ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
@@ -157,6 +154,8 @@ public class ReservationDatabase {
 
     }
 
-
+    public void updateItineraryList(ArrayList list){
+        recentItineraryList = list;
+    }
 }
 

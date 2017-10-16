@@ -2,6 +2,7 @@ package AFRS;
 
 import AFRS.Requests.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -21,7 +22,7 @@ public class RequestController {
         requests.put("retrieve", new RetrieveRequest(reservationDB));
     }
 
-    public ArrayList<String> parse(String str) {
+    public ArrayList<String> parse(String str) throws IOException{
         String input = str.substring(0, str.length() - 1);
         String[] requestAndParams = safeSplit(input);
         String request = requestAndParams[0];

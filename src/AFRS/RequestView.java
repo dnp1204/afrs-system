@@ -30,7 +30,7 @@ public class RequestView {
             response = parser.parse(input);
 
             if (response.get(0).equals("quit")) {
-                System.exit(0); ashjdjhasgda sjkhdf
+                System.exit(0);
             }
             printResponse(response);
         } while(!response.get(0).equals("quit"));
