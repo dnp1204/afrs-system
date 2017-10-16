@@ -12,6 +12,8 @@ public class ReservationDatabase {
     //this needs to read from file to populate and be persistent reservation database
     public ArrayList<Itinerary> recentItineraryList = new ArrayList<Itinerary>();
 
+    private final String FILEPATH = "../Data/reservations.txt";
+
 
 //- startUp() : void
 //- shutDown(): void
@@ -22,10 +24,10 @@ public class ReservationDatabase {
 
 
     //try to create a db from existing text file on start up
-    private void startUp(){
+    public void startUp(){
         try {
             //ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
-            BufferedReader inFile = new BufferedReader(new FileReader("ReservationDB.txt"));
+            BufferedReader inFile = new BufferedReader(new FileReader(FILEPATH));
             String inputLine;
 
             while ((inputLine = inFile.readLine()) != null) {
@@ -33,7 +35,7 @@ public class ReservationDatabase {
                 String[] reservationInfo = inputLine.split(",");
                 //split into each reservation
                 //then split passenger name and Itinerary string
-                new_reservation.setPassengerName(reservationInfo[0])
+                new_reservation.setPassengerName(reservationInfo[0]);
                 //call Itinerary constructor with string parameter
                 Itinerary new_itinerary_from_string = new Itinerary(reservationInfo[1]); //TODO: create a Itinerary constructor for String param
                 new_reservation.setItinerary(new_itinerary_from_string);
@@ -50,13 +52,13 @@ public class ReservationDatabase {
         }
     }
     //write to new txt file to save current db
-    private void shutDown() throws IOException{
+    public void shutDown() throws IOException{
         StringBuffer output = new StringBuffer();
         for ( Reservation r : reservationList){
             output.append(r.toString());
             output.append("/n");
         }
-        BufferedWriter writer = new BufferedWriter(new FileWriter("ReservationDB.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(FILEPATH));
         writer.write(String.valueOf(output));
         writer.close();
         }

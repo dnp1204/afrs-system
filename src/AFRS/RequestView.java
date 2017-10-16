@@ -1,5 +1,6 @@
 package AFRS;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -16,24 +17,28 @@ public class RequestView {
         parser = new RequestController();
         System.out.println("WELCOME TO THE AIRLINE FLIGHT RESERVATION SYSTEM");
         System.out.println("PLEASE INPUT A REQUEST FOLLOWED BY A SEMICOLON");
-        do {
-            input = "";
+        try {
             do {
-                System.out.print(PROMPT);
-                input += scan.nextLine();
+                input = "";
+                do {
+                    System.out.print(PROMPT);
+                    input += scan.nextLine();
 
-                if(!input.substring(input.length()-1).equals(";")) {
-                    System.out.println("partial-request");
+                    if (!input.substring(input.length() - 1).equals(";")) {
+                        System.out.println("partial-request");
+                    }
+                } while (!input.substring(input.length() - 1).equals(";"));
+
+                response = parser.parse(input);
+
+                if (response.get(0).equals("quit")) {
+                    System.exit(0);
                 }
-            } while(!input.substring(input.length()-1).equals(";"));
-
-            response = parser.parse(input);
-
-            if (response.get(0).equals("quit")) {
-                System.exit(0);
-            }
-            printResponse(response);
-        } while(!response.get(0).equals("quit"));
+                printResponse(response);
+            } while (!response.get(0).equals("quit"));
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void printResponse(ArrayList<String> response) {
