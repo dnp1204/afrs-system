@@ -14,6 +14,12 @@ public class DeleteRequest implements Request {
 
     @Override
     public ArrayList<String> doRequest(String[] params) {
+        //format should be delete,passenger,origin,destination
+        String passenger = params[1];
+        String origin = params[2];
+        String destination = params[3];
+        ReservationDatabase.delete(passenger, origin, destination);
+
         return null;
     }
 }
