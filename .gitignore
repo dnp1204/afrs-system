@@ -2,6 +2,10 @@
 ### Java template
 # Compiled class file
 *.class
+out/
+
+#jack added this
+.idea/workspace.xml
 
 #jack added this
 .idea/workspace.xml

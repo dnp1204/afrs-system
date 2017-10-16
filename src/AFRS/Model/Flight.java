@@ -1,13 +1,10 @@
-package Model;
+package AFRS.Model;
 
-import java.util.ArrayList;
 import java.util.Date;
 
-public class Itinerary implements FlightComponent {
+public class Flight implements FlightComponent {
 
-    public Itinerary() {
-
-    }
+    public Flight() { }
 
     @Override
     public int getAirfare() {
@@ -32,5 +29,9 @@ public class Itinerary implements FlightComponent {
     @Override
     public String getDestination() {
         return null;
+    }
+
+    public int getFlightNumber() {
+        return 0;
     }
 }

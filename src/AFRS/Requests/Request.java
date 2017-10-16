@@ -1,4 +1,4 @@
-package Requests;
+package AFRS.Requests;
 
 import java.util.ArrayList;
 

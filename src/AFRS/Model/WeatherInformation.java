@@ -1,4 +1,4 @@
-package Model;
+package AFRS.Model;
 
 public class WeatherInformation {
     private String condition;

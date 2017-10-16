@@ -1,6 +1,6 @@
 package Strategy;
 
-import Model.Itinerary;
+import AFRS.Model.Itinerary;
 
 import java.util.ArrayList;
 

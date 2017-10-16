@@ -1,19 +1,17 @@
-package Requests;
+package AFRS.Requests;
 
-import Model.Airport;
-import Model.WeatherInformation;
-import Requests.Request;
+import AFRS.Model.Airport;
+import AFRS.Model.WeatherInformation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Queue;
 
 public class AirportRequest implements Request {
 
-    private final String DIR = "/Data/";
+    private final String DIR = "/AFRS/Data/";
     private final String AIRPORTSCODE = "airports.txt";
     private final String WEATHERINFO = "weather.txt";
 
