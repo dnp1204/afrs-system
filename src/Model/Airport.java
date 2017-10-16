@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class Airport {
@@ -11,6 +12,7 @@ public class Airport {
     public Airport(String code, String name) {
         this.code = code;
         this.name = name;
+        weatherTempList = new LinkedList<>();
     }
 
     public String getCode() {
@@ -38,7 +40,7 @@ public class Airport {
     }
 
     private String displayCurrentWeather() {
-        WeatherInformation temp = weatherTempList.poll();
+        WeatherInformation temp = weatherTempList.remove();
         weatherTempList.add(temp);
         return temp.toString();
     }
