@@ -1,8 +1,15 @@
 package Model;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Itinerary implements FlightComponent {
+    private ArrayList<Flight> flightList;
+
+    public Itinerary(ArrayList<Flight> flightList) {
+        this.flightList = flightList;
+    }
+
     @Override
     public int getAirfare() {
         return 0;

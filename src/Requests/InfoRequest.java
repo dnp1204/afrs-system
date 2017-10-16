@@ -1,5 +1,6 @@
 package Requests;
 
+import Model.Airport;
 import Model.Flight;
 
 import java.io.BufferedReader;
@@ -18,21 +19,51 @@ public class InfoRequest implements Request {
     private final String FLIGHTS = "flights.txt";
     private final String DELAYS = "delays.txt";
     private final String CONNECTTIONS = "connections.txt";
+    private final String AIRPORTSCODE = "airports.txt";
 
     private ArrayList<Flight> flightList;
     private HashMap<String, Integer> connectionTimeMap;
     private HashMap<String, Integer> delayTimeMap;
+    private HashMap<String, Airport> airportHashMap;
 
     public InfoRequest() {
         flightList = new ArrayList<>();
         connectionTimeMap = new HashMap<>();
         delayTimeMap = new HashMap<>();
+        airportHashMap = new HashMap<>();
         readData();
     }
 
     @Override
     public ArrayList<String> doRequest(String[] params) {
-        return null;
+        ArrayList<String> result = new ArrayList<>();
+
+        String origin = params[0];
+        String destination = params[1];
+        String sortOrder = "departure";
+        int maxConnections = 2;
+
+        if (params.length > 2) {
+            maxConnections = Integer.parseInt(params[2]);
+        }
+
+        if (params.length > 3) {
+            sortOrder = params[3];
+        }
+
+        if (!airportHashMap.containsKey(origin)) {
+            result.add("error,unknown origin");
+        } else if (!airportHashMap.containsKey(destination)) {
+            result.add("error,unknown destination");
+        } else if (maxConnections > 2 || maxConnections < 0) {
+            result.add("error,invalid connection limit");
+        } else if (!sortOrder.equals("departure") && !sortOrder.equals("arrival") && !sortOrder.equals("airfare")) {
+            result.add("error,invalid sort order");
+        } else {
+            result.add("good");
+        }
+
+        return result;
     }
 
     private void readData() {
@@ -104,6 +135,17 @@ public class InfoRequest implements Request {
             e.printStackTrace();
         }
 
-        System.out.println(flightList);
+        // Read airport's name
+        br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(DIR + AIRPORTSCODE)));
+        try {
+            line = br.readLine();
+            while (line != null) {
+                String[] airport = line.split(",");
+                airportHashMap.put(airport[0], new Airport(airport[0], airport[1]));
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -60,6 +60,10 @@ public class AirportRequest implements Request {
         }
     }
 
+    public HashMap<String, Airport> getAirportHashMap() {
+        return airportHashMap;
+    }
+
     @Override
     public ArrayList<String> doRequest(String[] params) {
         ArrayList<String> result = new ArrayList<>();
