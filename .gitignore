@@ -3,6 +3,9 @@
 # Compiled class file
 *.class
 
+#jack added this
+.idea/workspace.xml
+
 # Log file
 *.log
 
