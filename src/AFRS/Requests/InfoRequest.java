@@ -3,6 +3,7 @@ package AFRS.Requests;
 import AFRS.ReservationDatabase;
 import AFRS.Model.*;
 import AFRS.SortTypes.*;
+import AFRS.Data.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -53,7 +54,7 @@ public class InfoRequest implements Request {
     * @Returns: boolean that is true if no errors were read, false if error occurred
      */
 
-    public boolean readInFlightFile() {
+    private boolean readInFlightFile() {
 
         String flightFileName = "flights.txt";
         String line;
@@ -94,7 +95,7 @@ public class InfoRequest implements Request {
     * @Returns: boolean that is true if no errors were caught, false if error occurred
      */
 
-    public boolean readInConnectionFile() {
+    private boolean readInConnectionFile() {
         String connectionFileName = "connections.txt";
         String line = null;
 
@@ -133,7 +134,7 @@ public class InfoRequest implements Request {
     * @Returns: boolean that is true if no errors were read, false if error occurred
      */
 
-    public boolean readInDelayFile() {
+    private boolean readInDelayFile() {
 
         String delayFileName = "delays.txt";
         String line = null;
@@ -173,7 +174,7 @@ public class InfoRequest implements Request {
     * @Parameters: int limit is the number of max connections wanted
      */
 
-    public void setConnectionLimit(String limit) {
+    private void setConnectionLimit(String limit) {
         if (!limit.equals("") && Integer.parseInt(limit) < 3) {
             connectionLimit = Integer.parseInt(limit);
         }
@@ -185,7 +186,7 @@ public class InfoRequest implements Request {
     * @Parameters: ItinerarySort sortType: a Itinerary sort that determines returned info order
      */
 
-    public void setSorter(String sortType) {
+    private void setSorter(String sortType) {
 
         switch (sortType) {
 
@@ -210,7 +211,7 @@ public class InfoRequest implements Request {
     * Will determine if no itineraries were available
      */
 
-    public void sort() {
+    private void sort() {
 
         ArrayList<Itinerary> newlySorted = sortBy.doSort(itineraryList);
         itineraryList = newlySorted;
@@ -223,7 +224,7 @@ public class InfoRequest implements Request {
             System.out.println("There are no possible routes");
         }
 
-        //ReservationDatabase.updateItineraries(itineraryList);
+        ReservationDatabase.updateItineraries(itineraryList);
 
     }
 
@@ -277,7 +278,7 @@ public class InfoRequest implements Request {
     *
      */
 
-    public Itinerary calculateRoute(String currentFlight) {
+    private Itinerary calculateRoute(String currentFlight) {
 
         ArrayList<Flight> possibleFlight = new ArrayList<>();
 
@@ -360,7 +361,7 @@ public class InfoRequest implements Request {
 
     }
 
-    public boolean canMakeFlight(String flightA, String flightB) {
+    private boolean canMakeFlight(String flightA, String flightB) {
 
         String[] flightAComponents = flightA.split(",");
         LocalTime destArrival = calculateArrivalTime(flightA);
@@ -384,7 +385,7 @@ public class InfoRequest implements Request {
     }
 
 
-    public LocalTime calculateArrivalTime(String flight) {
+    private LocalTime calculateArrivalTime(String flight) {
 
 
         String[] flightComponents = flight.split(",");
@@ -408,7 +409,7 @@ public class InfoRequest implements Request {
 
     }
 
-    public LocalTime calculateDepartureTime(String flight) {
+    private LocalTime calculateDepartureTime(String flight) {
 
 
         String[] flightComponents = flight.split(",");
@@ -432,7 +433,7 @@ public class InfoRequest implements Request {
 
     }
 
-    public Itinerary createItinerary(ArrayList<Flight> flights) {
+    private Itinerary createItinerary(ArrayList<Flight> flights) {
         Itinerary connectedFlight = new Itinerary(flights);
         return connectedFlight;
     }
