@@ -3,12 +3,8 @@ package AFRS.Requests;
 import AFRS.ReservationDatabase;
 import AFRS.Model.*;
 import AFRS.SortTypes.*;
-import AFRS.Data.*;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,12 +52,12 @@ public class InfoRequest implements Request {
 
     private boolean readInFlightFile() {
 
-        String flightFileName = "flights.txt";
+        String flightFileName = "/AFRS/Data/flights.txt";
         String line;
 
         try {
 
-            FileReader fileReader = new FileReader(flightFileName);
+            InputStreamReader fileReader = new InputStreamReader(getClass().getResourceAsStream(flightFileName));
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -73,11 +69,6 @@ public class InfoRequest implements Request {
             bufferedReader.close();
 
 
-        }
-
-        catch(FileNotFoundException noFileEx) {
-            System.out.println("Unable to read file '" + flightFileName + "'");
-            return false;
         }
 
         catch(IOException ioEX) {
@@ -96,12 +87,12 @@ public class InfoRequest implements Request {
      */
 
     private boolean readInConnectionFile() {
-        String connectionFileName = "connections.txt";
+        String connectionFileName = "/AFRS/Data/connections.txt";
         String line = null;
 
         try {
 
-            FileReader fileReader = new FileReader(connectionFileName);
+            InputStreamReader fileReader = new InputStreamReader(getClass().getResourceAsStream(connectionFileName));
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -113,11 +104,6 @@ public class InfoRequest implements Request {
             bufferedReader.close();
 
 
-        }
-
-        catch(FileNotFoundException noFileEx) {
-            System.out.println("Unable to read file '" + connectionFileName + "'");
-            return false;
         }
 
         catch(IOException ioEX) {
@@ -136,12 +122,12 @@ public class InfoRequest implements Request {
 
     private boolean readInDelayFile() {
 
-        String delayFileName = "delays.txt";
+        String delayFileName = "/AFRS/Data/delays.txt";
         String line = null;
 
         try {
 
-            FileReader fileReader = new FileReader(delayFileName);
+            InputStreamReader fileReader = new InputStreamReader(getClass().getResourceAsStream(delayFileName));
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -224,7 +210,7 @@ public class InfoRequest implements Request {
             System.out.println("There are no possible routes");
         }
 
-        ReservationDatabase.updateItineraries(itineraryList);
+        reservationDB.updateItineraryList(itineraryList);
 
     }
 
@@ -268,6 +254,7 @@ public class InfoRequest implements Request {
         for (Itinerary itin : itineraryList) {
             itineraryListString.add(itin.toString());
         }
+
 
         return itineraryListString;
 

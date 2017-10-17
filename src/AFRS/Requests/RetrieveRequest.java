@@ -1,5 +1,6 @@
 package AFRS.Requests;
 
+import AFRS.Model.Reservation;
 import AFRS.ReservationDatabase;
 
 import java.util.ArrayList;
@@ -20,8 +21,13 @@ public class RetrieveRequest implements Request {
         String passenger = params[1];
         String origin = params[2];
         String destination = params[3];
-        ArrayList<String> list = ReservationDatabase.retrieve(passenger, origin, destination);
+        ArrayList<Reservation> list = ReservationDatabase.retrieve(passenger, origin, destination);
+        ArrayList<String> stringList = new ArrayList<>();
+        stringList.add("retrieve,"+list.size());
+        for(int i = 0; i < list.size(); i++) {
+            stringList.add((i+1)+","+list.get(i).getItinerary().toString());
+        }
 
-        return list;
+        return stringList;
     }
 }

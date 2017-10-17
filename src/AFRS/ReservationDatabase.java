@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class ReservationDatabase {
-    private ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
+    private static ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
     //this needs to read from file to populate and be persistent reservation database
-    public ArrayList<Itinerary> recentItineraryList = new ArrayList<Itinerary>();
+    public static ArrayList<Itinerary> recentItineraryList = new ArrayList<Itinerary>();
 
-    private final String FILEPATH = "../Data/reservations.txt";
+    private final String FILEPATH = "/AFRS/DATA/reservations.txt";
 
 
 //- startUp() : void
@@ -27,7 +27,7 @@ public class ReservationDatabase {
     public void startUp(){
         try {
             //ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
-            BufferedReader inFile = new BufferedReader(new FileReader(FILEPATH));
+            BufferedReader inFile = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(FILEPATH)));
             String inputLine;
 
             while ((inputLine = inFile.readLine()) != null) {
@@ -44,9 +44,6 @@ public class ReservationDatabase {
                 System.out.print(new_reservation);
             }
 
-        } catch (FileNotFoundException e) {
-            // this is what happens if there is no previous reservation list to populate db
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,7 +63,7 @@ public class ReservationDatabase {
     //called by client to reserve an itinerary that was just queried
     //params: itinerary (Itinerary) - the itinerary to be reserved4
 
-    public String reserve(int id, String passengerName) {
+    public static String reserve(int id, String passengerName) {
 
         // check if id is valid
         // then check if this reservation already exists
@@ -98,7 +95,7 @@ public class ReservationDatabase {
         //TODO; error handle duplicate reservation
     }
 
-    public String delete(String passenger, String origin, String destination) {
+    public static String delete(String passenger, String origin, String destination) {
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 Itinerary itinerary = r.getItinerary();
@@ -112,7 +109,7 @@ public class ReservationDatabase {
 
     }
 
-    public ArrayList<Reservation> retrieve(String passenger){
+    public static ArrayList<Reservation> retrieve(String passenger){
         ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
@@ -123,7 +120,7 @@ public class ReservationDatabase {
         return temp_list;
     }
     //how to tell if i am given just origin or just destination. It would just be a string
-    public ArrayList<Reservation> retrieve(String passenger, String origin){
+    public static ArrayList<Reservation> retrieve(String passenger, String origin){
         ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
@@ -142,7 +139,7 @@ public class ReservationDatabase {
 //        return;
 //    }
 
-    public ArrayList<Reservation> retrieve(String passenger, String origin, String destination){
+    public static ArrayList<Reservation> retrieve(String passenger, String origin, String destination){
         ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
