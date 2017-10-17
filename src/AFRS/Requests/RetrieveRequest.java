@@ -15,12 +15,12 @@ public class RetrieveRequest implements Request {
 
     @Override
     public ArrayList<String> doRequest(String[] params) {
-        //format should be retrieve,passenger,origin,destination
-        //needs to handle ommision of origin or omision of destination
+        //format should be passenger,origin,destination
+        //needs to handle omission of origin or omission of destination
         //always sort return by origin
-        String passenger = params[1];
-        String origin = params[2];
-        String destination = params[3];
+        String passenger = params[0];
+        String origin = params[1];
+        String destination = params[2];
         ArrayList<Reservation> list = ReservationDatabase.retrieve(passenger, origin, destination);
         ArrayList<String> stringList = new ArrayList<>();
         stringList.add("retrieve,"+list.size());
