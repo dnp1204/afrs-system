@@ -1,37 +1,57 @@
 package AFRS.Model;
 
+import java.time.LocalTime;
 import java.util.Date;
 
 public class Flight implements FlightComponent {
 
-    public Flight() { }
+    private String origin;
+    private String destination;
+    private LocalTime departureTime;
+    private LocalTime arrivalTime;
+    private int airfare;
+    private int flightNumber;
 
-    @Override
+    public Flight(String ori, String dest, LocalTime departTime, LocalTime arriveTime, int airfareCost, int flightNumber) {
+
+        origin = ori;
+        destination = dest;
+        departureTime = departTime;
+        arrivalTime = arriveTime;
+        airfare = airfareCost;
+        this.flightNumber = flightNumber;
+
+    }
+
+
     public int getAirfare() {
-        return 0;
+        return airfare;
     }
 
-    @Override
-    public Date getDepartureTime() {
-        return null;
+    public LocalTime getDepartureTime() {
+        return departureTime;
     }
 
-    @Override
-    public Date getArrivalTime() {
-        return null;
+    public LocalTime getArrivalTime() {
+        return arrivalTime;
     }
 
-    @Override
     public String getOrigin() {
-        return null;
+        return origin;
     }
 
-    @Override
     public String getDestination() {
-        return null;
+        return destination;
     }
 
-    public int getFlightNumber() {
-        return 0;
+    public int getFlightNumber() { return flightNumber; }
+
+    public String toString() {
+
+        String flightRundown = getFlightNumber() + "," + getOrigin() + "," + getDepartureTime() + "," + getDestination() + "," + getArrivalTime();
+
+        return flightRundown;
     }
+
+
 }
