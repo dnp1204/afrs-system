@@ -3,13 +3,16 @@ package AFRS.Requests;
 import AFRS.ReservationDatabase;
 import AFRS.Model.*;
 import AFRS.SortTypes.*;
+import AFRS.Data.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.time.LocalTime;
 
 public class InfoRequest implements Request {
 
@@ -222,9 +225,18 @@ public class InfoRequest implements Request {
 
     public ArrayList<String> doRequest(String[] params) {
 
+        if (params.length == 4) {
+            setConnectionLimit(params[2]);
+            setSorter(params[3]);
+        } else if (params.length == 3) {
+            try {
+                Integer.parseInt(params[2]);
+                setConnectionLimit(params[2]);
+            } catch (NumberFormatException e) {
+                setSorter(params[2]);
+            }
+        }
 
-        setConnectionLimit(params[2]);
-        setSorter(params[3]);
 
         requestParams = new ArrayList<>();
         requestParams.add(params[0]);
@@ -251,10 +263,13 @@ public class InfoRequest implements Request {
 
         ArrayList<String> itineraryListString = new ArrayList<>();
 
-        for (Itinerary itin : itineraryList) {
-            itineraryListString.add(itin.toString());
-        }
+        int i = 0;
+        String info = "info, " + itineraryListString.size();
 
+        for (Itinerary itin : itineraryList) {
+            i++;
+            itineraryListString.add(i + ", " + itin.toString());
+        }
 
         return itineraryListString;
 
@@ -273,7 +288,10 @@ public class InfoRequest implements Request {
 
         LocalTime arrivalTime = calculateArrivalTime(currentFlight);
         LocalTime departureTime = calculateDepartureTime(currentFlight);
-        Flight addedFlight = new Flight(flightComponents[0], flightComponents[1], departureTime, arrivalTime, Integer.parseInt(flightComponents[4]), Integer.parseInt(flightComponents[5]));
+
+        //flightComponents[0] is origin, flightComponents[1] is destination, flightComponents[2] is departure time, flightComponents[3] is arrival time, flightComponent[4] is airfare, flightComponent[5] is flight number
+
+        Flight addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
         possibleFlight.add(addedFlight);
 
         if (flightComponents[1].equals(requestParams.get(1))) {
@@ -291,7 +309,7 @@ public class InfoRequest implements Request {
             if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(currentFlight, possibleLeg) && flightComponents[0].equals(destOrigin)) {
                 arrivalTime = calculateArrivalTime(possibleLeg);
                 departureTime = calculateDepartureTime(possibleLeg);
-                addedFlight = new Flight(flightComponents[0], flightComponents[1], departureTime, arrivalTime, Integer.parseInt(flightComponents[4]), Integer.parseInt(flightComponents[5]));
+                addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                 possibleFlight.add(addedFlight);
                 return createItinerary(possibleFlight);
             }
@@ -303,7 +321,7 @@ public class InfoRequest implements Request {
                     arrivalTime = calculateArrivalTime(possibleLeg);
                     departureTime = calculateDepartureTime(possibleLeg);
 
-                    addedFlight = new Flight(flightComponents[0], flightComponents[1], arrivalTime, departureTime, Integer.parseInt(flightComponents[4]), Integer.parseInt(flightComponents[5]));
+                    addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                     possibleFlight.add(addedFlight);
                     destOrigin = flightComponents[1];
                     currentFlight = possibleLeg;
@@ -315,7 +333,7 @@ public class InfoRequest implements Request {
                         if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(possibleLeg, nextPossibleLeg) && flightComponents[0].equals(destOrigin)) {
                             arrivalTime = calculateArrivalTime(nextPossibleLeg);
                             departureTime = calculateDepartureTime(nextPossibleLeg);
-                            addedFlight = new Flight(flightComponents[0], flightComponents[1], departureTime, arrivalTime, Integer.parseInt(flightComponents[4]), Integer.parseInt(flightComponents[5]));
+                            addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                             possibleFlight.add(addedFlight);
                             return createItinerary(possibleFlight);
                         }
@@ -326,7 +344,7 @@ public class InfoRequest implements Request {
                             if (canMakeFlight(possibleLeg, nextPossibleLeg)) {
                                 arrivalTime = calculateArrivalTime(nextPossibleLeg);
                                 departureTime = calculateDepartureTime(nextPossibleLeg);
-                                addedFlight = new Flight(flightComponents[0], flightComponents[1], arrivalTime, departureTime, Integer.parseInt(flightComponents[4]), Integer.parseInt(flightComponents[5]));
+                                addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                                 possibleFlight.add(addedFlight);
                                 if (destOrigin.equals(requestParams.get(1))) {
                                     return createItinerary(possibleFlight);
