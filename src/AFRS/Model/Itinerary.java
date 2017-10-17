@@ -2,17 +2,18 @@ package AFRS.Model;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Itinerary implements FlightComponent {
 
-    public String origin;
-    public String destination;
-    public LocalTime departureTime;
-    public LocalTime arrivalTime;
-    public int airfare;
-    public int flightCount;
+    private String origin;
+    private String destination;
+    private LocalTime departureTime;
+    private LocalTime arrivalTime;
+    private int airfare;
+    private int flightCount;
 
-    public ArrayList<Flight> flightList;
+    private ArrayList<Flight> flightList;
 
     public Itinerary(ArrayList<Flight> flightArray) {
 
@@ -24,6 +25,12 @@ public class Itinerary implements FlightComponent {
         flightList = flightArray;
         airfare = calculateFlightAirfare();
         flightCount = flightList.size();
+
+    }
+
+    public Itinerary(String itineraryInformation) {
+
+
 
     }
 

@@ -5,12 +5,12 @@ import java.util.Date;
 
 public class Flight implements FlightComponent {
 
-    public String origin;
-    public String destination;
-    public LocalTime departureTime;
-    public LocalTime arrivalTime;
-    public int airfare;
-    public int flightNumber;
+    private String origin;
+    private String destination;
+    private LocalTime departureTime;
+    private LocalTime arrivalTime;
+    private int airfare;
+    private int flightNumber;
 
     public Flight(String ori, String dest, LocalTime departTime, LocalTime arriveTime, int airfareCost, int flightNumber) {
 
