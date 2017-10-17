@@ -31,13 +31,13 @@ public class ReservationDatabase {
             String inputLine;
 
             while ((inputLine = inFile.readLine()) != null) {
+                //each line is a new reservation
                 Reservation new_reservation = new Reservation();
-                String[] reservationInfo = inputLine.split(",");
-                //split into each reservation
-                //then split passenger name and Itinerary string
+                //separate passenger name from rest
+                String[] reservationInfo = inputLine.split(",",2);
                 new_reservation.setPassengerName(reservationInfo[0]);
                 //call Itinerary constructor with string parameter
-                Itinerary new_itinerary_from_string = new Itinerary(reservationInfo[1]); //TODO: create a Itinerary constructor for String param
+                Itinerary new_itinerary_from_string = new Itinerary(reservationInfo[2]);
                 new_reservation.setItinerary(new_itinerary_from_string);
 
                 reservationList.add(new_reservation);
@@ -61,7 +61,8 @@ public class ReservationDatabase {
         }
 
     //called by client to reserve an itinerary that was just queried
-    //params: itinerary (Itinerary) - the itinerary to be reserved4
+    //params: id (int) - the id of the itinerary form the list of recent itineraries, starting with 1.
+    //        passengerName (String) - passenger name
 
     public static String reserve(int id, String passengerName) {
 
