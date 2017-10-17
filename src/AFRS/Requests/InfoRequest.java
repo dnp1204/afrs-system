@@ -3,7 +3,6 @@ package AFRS.Requests;
 import AFRS.ReservationDatabase;
 import AFRS.Model.*;
 import AFRS.SortTypes.*;
-import AFRS.Data.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -175,21 +174,24 @@ public class InfoRequest implements Request {
     * @Parameters: ItinerarySort sortType: a Itinerary sort that determines returned info order
      */
 
-    private void setSorter(String sortType) {
+    private boolean setSorter(String sortType) {
 
         switch (sortType) {
 
-            case "":
-                sortBy = new DepartureTimeSort();
-
             case "departure":
                 sortBy = new DepartureTimeSort();
+                return true;
 
             case "arrival":
                 sortBy = new ArrivalTimeSort();
+                return true;
 
             case "airfare":
                 sortBy = new AirfareSort();
+                return true;
+
+            default:
+                return false;
 
         }
 
@@ -205,14 +207,6 @@ public class InfoRequest implements Request {
         ArrayList<Itinerary> newlySorted = sortBy.doSort(itineraryList);
         itineraryList = newlySorted;
 
-        for (Itinerary itin : itineraryList) {
-            System.out.println(itin);
-        }
-
-        if (itineraryList.size() == 0) {
-            System.out.println("There are no possible routes");
-        }
-
         reservationDB.updateItineraryList(itineraryList);
 
     }
@@ -225,15 +219,28 @@ public class InfoRequest implements Request {
 
     public ArrayList<String> doRequest(String[] params) {
 
+        ArrayList<String> itineraryListString = new ArrayList<>();
+
         if (params.length == 4) {
             setConnectionLimit(params[2]);
-            setSorter(params[3]);
+            if (!setSorter(params[3])) {
+                itineraryListString.add("error,invalid sort order");
+                return itineraryListString;
+            }
         } else if (params.length == 3) {
             try {
                 Integer.parseInt(params[2]);
-                setConnectionLimit(params[2]);
+                if (Integer.parseInt(params[2]) < 3) {
+                    setConnectionLimit(params[2]);
+                } else {
+                    itineraryListString.add("error,invalid connection limit");
+                    return itineraryListString;
+                }
             } catch (NumberFormatException e) {
-                setSorter(params[2]);
+                if (!setSorter(params[2])) {
+                    itineraryListString.add("error,invalid sort order");
+                    return itineraryListString;
+                }
             }
         }
 
@@ -246,6 +253,14 @@ public class InfoRequest implements Request {
 
         //Loops through the whole flight list finding flights that start from the parameter origin
         for (String flight : flightDataList) {
+
+            if (!connectionMap.containsKey(origin)) {
+                itineraryListString.add("error,unknown origin");
+                return itineraryListString;
+            } else if (!connectionMap.containsKey(params[1])) {
+                itineraryListString.add("error,unknown destination");
+                return itineraryListString;
+            }
 
             if (flight.split(",")[0].equals(origin)) {
 
@@ -261,14 +276,13 @@ public class InfoRequest implements Request {
 
         sort();
 
-        ArrayList<String> itineraryListString = new ArrayList<>();
-
         int i = 0;
-        String info = "info, " + itineraryListString.size();
+        String info = "info, " + itineraryList.size();
+        itineraryListString.add(info);
 
         for (Itinerary itin : itineraryList) {
             i++;
-            itineraryListString.add(i + ", " + itin.toString());
+            itineraryListString.add(i + "," + itin.toString());
         }
 
         return itineraryListString;
