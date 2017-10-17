@@ -12,7 +12,8 @@ public class Flight implements FlightComponent {
     private int airfare;
     private int flightNumber;
 
-    public Flight(String ori, String dest, LocalTime departTime, LocalTime arriveTime, int airfareCost, int flightNumber) {
+    //public Flight(String ori, String dest, LocalTime departTime, LocalTime arriveTime, int airfareCost, int flightNumber) {
+    public Flight(int flightNumber, String ori, LocalTime departTime, String dest, LocalTime arriveTime, int airfareCost) {
 
         origin = ori;
         destination = dest;

@@ -30,7 +30,39 @@ public class Itinerary implements FlightComponent {
 
     public Itinerary(String itineraryInformation) {
 
+        ArrayList<String> itineraryComponents = new ArrayList<>(Arrays.asList(itineraryInformation.split(",")));
 
+        airfare = Integer.parseInt(itineraryComponents.get(0));
+        flightCount = Integer.parseInt(itineraryComponents.get(1));
+
+        for (int i = 2; i < itineraryComponents.size(); i += 5) {
+            LocalTime departTime = calculateTime(itineraryComponents.get(i + 2));
+            LocalTime arriveTime = calculateTime(itineraryComponents.get(i + 4));
+            Flight newFlight = new Flight(Integer.parseInt(itineraryComponents.get(i)), itineraryComponents.get(i + 1), departTime, itineraryComponents.get(i + 3), arriveTime, 0);
+            flightList.add(newFlight);
+        }
+
+    }
+
+    private LocalTime calculateTime(String givenTime) {
+
+        int hours = Integer.parseInt(givenTime.split(":")[0]);
+        if (givenTime.split(":")[1].contains("p")) {
+            hours += 12;
+        }
+
+        if (hours == 12) {
+            hours = 0;
+        } else if (hours == 24) {
+            hours = 12;
+        }
+
+        int minutes = Integer.parseInt(givenTime.split(":")[1].substring(0, 2));
+
+
+        LocalTime time = LocalTime.of(hours, minutes);
+
+        return time;
 
     }
 
@@ -64,9 +96,7 @@ public class Itinerary implements FlightComponent {
             itineraryRundown += leg.toString() + ",";
         }
 
-        itineraryRundown.substring(0, itineraryRundown.length() - 1);
-
-        return itineraryRundown;
+        return itineraryRundown.substring(0, itineraryRundown.length() - 1);
     }
 
 }
