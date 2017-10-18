@@ -163,9 +163,7 @@ public class InfoRequest implements Request {
      */
 
     private void setConnectionLimit(String limit) {
-        if (!limit.equals("") && Integer.parseInt(limit) < 3) {
-            connectionLimit = Integer.parseInt(limit);
-        }
+        connectionLimit = Integer.parseInt(limit);
     }
 
     /*
@@ -204,8 +202,11 @@ public class InfoRequest implements Request {
 
     private void sort() {
 
-        ArrayList<Itinerary> newlySorted = sortBy.doSort(itineraryList);
-        itineraryList = newlySorted;
+        if (itineraryList == null) {
+            System.out.println("List is null");
+        }
+
+        itineraryList = sortBy.doSort(itineraryList);
 
         reservationDB.updateItineraryList(itineraryList);
 
@@ -242,6 +243,9 @@ public class InfoRequest implements Request {
                     return itineraryListString;
                 }
             }
+        } else {
+            setSorter("departure");
+            setConnectionLimit("2");
         }
 
 
@@ -432,8 +436,8 @@ public class InfoRequest implements Request {
 
 
         String[] flightComponents = flight.split(",");
-        int hours = Integer.parseInt(flightComponents[3].split(":")[0]);
-        if (flightComponents[3].split(":")[1].contains("p")) {
+        int hours = Integer.parseInt(flightComponents[2].split(":")[0]);
+        if (flightComponents[2].split(":")[1].contains("p")) {
             hours += 12;
         }
 
@@ -443,7 +447,7 @@ public class InfoRequest implements Request {
             hours = 12;
         }
 
-        int minutes = Integer.parseInt(flightComponents[3].split(":")[1].substring(0, 2));
+        int minutes = Integer.parseInt(flightComponents[2].split(":")[1].substring(0, 2));
 
 
         LocalTime time = LocalTime.of(hours, minutes);
