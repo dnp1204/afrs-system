@@ -31,7 +31,7 @@ public class Itinerary implements FlightComponent {
     public Itinerary(String itineraryInformation) {
 
         ArrayList<String> itineraryComponents = new ArrayList<>(Arrays.asList(itineraryInformation.split(",")));
-
+        flightList = new ArrayList<>();
         airfare = Integer.parseInt(itineraryComponents.get(0));
         flightCount = Integer.parseInt(itineraryComponents.get(1));
 
@@ -41,6 +41,9 @@ public class Itinerary implements FlightComponent {
             Flight newFlight = new Flight(Integer.parseInt(itineraryComponents.get(i)), itineraryComponents.get(i + 1), departTime, itineraryComponents.get(i + 3), arriveTime, 0);
             flightList.add(newFlight);
         }
+
+        origin = itineraryComponents.get(3);
+        destination = itineraryComponents.get(itineraryComponents.size() - 2);
 
     }
 

@@ -37,11 +37,10 @@ public class ReservationDatabase {
                 String[] reservationInfo = inputLine.split(",",2);
                 new_reservation.setPassengerName(reservationInfo[0]);
                 //call Itinerary constructor with string parameter
-                Itinerary new_itinerary_from_string = new Itinerary(reservationInfo[2]);
+                Itinerary new_itinerary_from_string = new Itinerary(reservationInfo[1]);
                 new_reservation.setItinerary(new_itinerary_from_string);
 
                 reservationList.add(new_reservation);
-                System.out.print(new_reservation);
             }
 
         } catch (IOException e) {
@@ -55,7 +54,7 @@ public class ReservationDatabase {
             output.append(r.toString());
             output.append("/n");
         }
-        BufferedWriter writer = new BufferedWriter(new FileWriter(FILEPATH));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(FILEPATH))));
         writer.write(String.valueOf(output));
         writer.close();
         }
@@ -96,7 +95,7 @@ public class ReservationDatabase {
         //TODO; error handle duplicate reservation
     }
 
-    public static String delete(String passenger, String origin, String destination) {
+    public String delete(String passenger, String origin, String destination) {
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 Itinerary itinerary = r.getItinerary();
@@ -110,7 +109,7 @@ public class ReservationDatabase {
 
     }
 
-    public static ArrayList<Reservation> retrieve(String passenger){
+    public ArrayList<Reservation> retrieve(String passenger){
         ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
@@ -121,12 +120,18 @@ public class ReservationDatabase {
         return temp_list;
     }
     //how to tell if i am given just origin or just destination. It would just be a string
-    public static ArrayList<Reservation> retrieve(String passenger, String origin){
+    public ArrayList<Reservation> retrieve(String passenger, String airport, boolean origin){
         ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
-                if (r.getItinerary().getOrigin().equals(origin)) {
-                    temp_list.add(r);
+                if(origin) {
+                    if (r.getItinerary().getOrigin().equals(airport)) {
+                        temp_list.add(r);
+                    }
+                } else {
+                    if (r.getItinerary().getDestination().equals(airport)) {
+                        temp_list.add(r);
+                    }
                 }
             }
         }
@@ -135,12 +140,7 @@ public class ReservationDatabase {
 
     }
 
-//    public ArrayList<Reservation> retrieve(String passenger, String destination){
-//       //same as above
-//        return;
-//    }
-
-    public static ArrayList<Reservation> retrieve(String passenger, String origin, String destination){
+    public ArrayList<Reservation> retrieve(String passenger, String origin, String destination){
         ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){

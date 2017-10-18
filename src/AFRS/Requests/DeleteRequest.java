@@ -18,8 +18,8 @@ public class DeleteRequest implements Request {
         String passenger = params[0];
         String origin = params[1];
         String destination = params[2];
-        ArrayList<String> response = new ArrayList<String>();
-        response.add(ReservationDatabase.delete(passenger, origin, destination));
+        ArrayList<String> response = new ArrayList<>();
+        response.add(reservationDB.delete(passenger, origin, destination));
 
         return response;
     }
