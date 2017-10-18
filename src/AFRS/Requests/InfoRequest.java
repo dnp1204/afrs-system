@@ -23,7 +23,7 @@ public class InfoRequest implements Request {
     private ArrayList<Itinerary> itineraryList = new ArrayList<>();
 
     private int connectionLimit;
-    private ItinerarySort sortBy;
+    private ItinerarySort sortBy = new DepartureTimeSort();
 
     private ReservationDatabase reservationDB;
 
@@ -224,7 +224,21 @@ public class InfoRequest implements Request {
         itineraryList.clear();
 
         if (params.length == 4) {
-            setConnectionLimit(params[2]);
+            System.out.println(params[0]+" "+params[1]+" "+params[2]+" "+params[3]);
+            try {
+                Integer.parseInt(params[2]);
+                if (-1 < Integer.parseInt(params[2]) &&  Integer.parseInt(params[2]) < 3) {
+                    setConnectionLimit(params[2]);
+                } else {
+                    itineraryListString.add("error,invalid connection limit");
+                    return itineraryListString;
+                }
+            } catch (NumberFormatException e) {
+                if(!params[2].equals("")) {
+                    itineraryListString.add("error,invalid connection limit");
+                    return itineraryListString;
+                }
+            }
             if (!setSorter(params[3])) {
                 itineraryListString.add("error,invalid sort order");
                 return itineraryListString;
@@ -232,7 +246,7 @@ public class InfoRequest implements Request {
         } else if (params.length == 3) {
             try {
                 Integer.parseInt(params[2]);
-                if (Integer.parseInt(params[2]) < 3) {
+                if (-1 < Integer.parseInt(params[2]) &&  Integer.parseInt(params[2]) < 3) {
                     setConnectionLimit(params[2]);
                 } else {
                     itineraryListString.add("error,invalid connection limit");

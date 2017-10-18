@@ -22,12 +22,11 @@ public class RequestView {
                 input = "";
                 do {
                     System.out.print(PROMPT);
-                    input += scan.nextLine();
-
-                    if (!input.substring(input.length() - 1).equals(";")) {
+                        input += scan.nextLine();
+                    if (input.length() == 0 || !input.substring(input.length() - 1).equals(";")) {
                         System.out.println("partial-request");
                     }
-                } while (!input.substring(input.length() - 1).equals(";"));
+                } while (input.length() == 0 || !input.substring(input.length() - 1).equals(";"));
 
                 response = parser.parse(input);
 

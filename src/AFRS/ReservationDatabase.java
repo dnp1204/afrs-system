@@ -57,7 +57,6 @@ public class ReservationDatabase {
 
         String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
         relativePath = relativePath.substring(relativePath.indexOf(":")+2);
-        System.out.println(relativePath);
         BufferedWriter writer = new BufferedWriter(new FileWriter(relativePath+FILEPATH, false));
         writer.write(String.valueOf(output));
         writer.close();
@@ -87,6 +86,9 @@ public class ReservationDatabase {
         catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
             return "error, invalid id";
+        }
+        catch (NumberFormatException e) {
+            return "error,invalid id";
         }
 
         Reservation new_reservation = new Reservation();
