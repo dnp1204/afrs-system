@@ -9,8 +9,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * The concrete command for querying an airport for it's Airport Information.
+ * Implements the Request interface.
+ */
 public class AirportRequest implements Request {
 
+    /* Constants for the location of data */
     private final String DIR = "/AFRS/Data/";
     private final String AIRPORTSCODE = "airports.txt";
     private final String WEATHERINFO = "weather.txt";
@@ -18,11 +23,18 @@ public class AirportRequest implements Request {
 
     private HashMap<String, Airport> airportHashMap;
 
+    /**
+     * constructor for AirportRequest
+     */
     public AirportRequest() {
         airportHashMap = new HashMap<>();
         readData();
     }
 
+    /**
+     * the helper method to parses the airport's name, weather information and
+     * delay time of an airport. This will be called in the constructor
+     */
     public void readData() {
         BufferedReader br;
         String line;
@@ -72,6 +84,12 @@ public class AirportRequest implements Request {
         }
     }
 
+    /**
+     * the doRequest method that override from Request interface. It will be
+     * called by the RequestController
+     * @return result: ArrayList - return the final result to the request view
+     * to display it to the client
+     */
     @Override
     public ArrayList<String> doRequest(String[] params) {
         ArrayList<String> result = new ArrayList<>();
