@@ -338,7 +338,7 @@ public class InfoRequest implements Request {
 
             flightComponents = possibleSecondLeg.split(",");
 
-            if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(startingFlight, possibleSecondLeg) && !(flightComponents[0].equals(destOrigin))) {
+            if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(startingFlight, possibleSecondLeg) && flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
                 arrivalTime = calculateArrivalTime(possibleSecondLeg);
                 departureTime = calculateDepartureTime(possibleSecondLeg);
                 addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
@@ -362,7 +362,7 @@ public class InfoRequest implements Request {
 
                         flightComponents = possibleThirdLeg.split(",");
 
-                        if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(possibleSecondLeg, possibleThirdLeg) && !(flightComponents[0].equals(destOrigin))) {
+                        if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(possibleSecondLeg, possibleThirdLeg) && flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
                             arrivalTime = calculateArrivalTime(possibleThirdLeg);
                             departureTime = calculateDepartureTime(possibleThirdLeg);
                             addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
