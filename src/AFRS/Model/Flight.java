@@ -1,7 +1,7 @@
 package AFRS.Model;
 
 import java.time.LocalTime;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
 
 public class Flight implements FlightComponent {
 
@@ -49,7 +49,20 @@ public class Flight implements FlightComponent {
 
     public String toString() {
 
-        String flightRundown = getFlightNumber() + "," + getOrigin() + "," + getDepartureTime() + "," + getDestination() + "," + getArrivalTime();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("hh:mm");
+
+        String arrivalM = "a";
+        String departM = "a";
+
+        if (arrivalTime.getHour() >= 12) {
+            arrivalM = "p";
+        }
+
+        if (departureTime.getHour() >= 12) {
+            departM = "p";
+        }
+
+        String flightRundown = getFlightNumber() + "," + getOrigin() + "," + getDepartureTime().format(format) + departM + "," + getDestination() + "," + getArrivalTime().format(format) + arrivalM;
 
         return flightRundown;
     }
