@@ -38,6 +38,7 @@ public class Reservation implements Comparable<Reservation> {
     public String toString(){
         StringBuffer output = new StringBuffer();
         output.append(this.getPassengerName());
+        output.append(",");
         output.append(this.getItinerary().toString());
         return String.valueOf(output);
     }

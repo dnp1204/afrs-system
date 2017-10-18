@@ -54,7 +54,11 @@ public class ReservationDatabase {
             output.append(r.toString());
             output.append("/n");
         }
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(FILEPATH))));
+
+        String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+        relativePath = relativePath.substring(relativePath.indexOf(":")+2);
+        System.out.println(relativePath);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(relativePath+FILEPATH, false));
         writer.write(String.valueOf(output));
         writer.close();
         }
