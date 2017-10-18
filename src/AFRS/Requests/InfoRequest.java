@@ -299,14 +299,14 @@ public class InfoRequest implements Request {
     *
      */
 
-    private Itinerary calculateRoute(String currentFlight) {
+    private Itinerary calculateRoute(String startingFlight) {
 
         ArrayList<Flight> possibleFlight = new ArrayList<>();
 
-        String[] flightComponents = currentFlight.split(",");
+        String[] flightComponents = startingFlight.split(",");
 
-        LocalTime arrivalTime = calculateArrivalTime(currentFlight);
-        LocalTime departureTime = calculateDepartureTime(currentFlight);
+        LocalTime arrivalTime = calculateArrivalTime(startingFlight);
+        LocalTime departureTime = calculateDepartureTime(startingFlight);
 
         //flightComponents[0] is origin, flightComponents[1] is destination, flightComponents[2] is departure time, flightComponents[3] is arrival time, flightComponent[4] is airfare, flightComponent[5] is flight number
 
@@ -321,13 +321,13 @@ public class InfoRequest implements Request {
         //So it is also the destination of the first leg of the flight
         String destOrigin = flightComponents[1];
 
-        for (String possibleLeg : flightDataList) {
+        for (String possibleSecondLeg : flightDataList) {
 
-            flightComponents = possibleLeg.split(",");
+            flightComponents = possibleSecondLeg.split(",");
 
-            if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(currentFlight, possibleLeg) && flightComponents[0].equals(destOrigin)) {
-                arrivalTime = calculateArrivalTime(possibleLeg);
-                departureTime = calculateDepartureTime(possibleLeg);
+            if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(startingFlight, possibleSecondLeg) && !(flightComponents[0].equals(destOrigin))) {
+                arrivalTime = calculateArrivalTime(possibleSecondLeg);
+                departureTime = calculateDepartureTime(possibleSecondLeg);
                 addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                 possibleFlight.add(addedFlight);
                 return createItinerary(possibleFlight);
@@ -335,23 +335,23 @@ public class InfoRequest implements Request {
 
             if (flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
 
-                if (canMakeFlight(currentFlight, possibleLeg)) {
+                if (canMakeFlight(startingFlight, possibleSecondLeg)) {
 
-                    arrivalTime = calculateArrivalTime(possibleLeg);
-                    departureTime = calculateDepartureTime(possibleLeg);
+                    arrivalTime = calculateArrivalTime(possibleSecondLeg);
+                    departureTime = calculateDepartureTime(possibleSecondLeg);
 
                     addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                     possibleFlight.add(addedFlight);
                     destOrigin = flightComponents[1];
-                    currentFlight = possibleLeg;
+                    startingFlight = possibleSecondLeg;
 
-                    for (String nextPossibleLeg : flightDataList) {
+                    for (String possibleThirdLeg : flightDataList) {
 
-                        flightComponents = nextPossibleLeg.split(",");
+                        flightComponents = possibleThirdLeg.split(",");
 
-                        if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(possibleLeg, nextPossibleLeg) && flightComponents[0].equals(destOrigin)) {
-                            arrivalTime = calculateArrivalTime(nextPossibleLeg);
-                            departureTime = calculateDepartureTime(nextPossibleLeg);
+                        if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(possibleSecondLeg, possibleThirdLeg) && !(flightComponents[0].equals(destOrigin))) {
+                            arrivalTime = calculateArrivalTime(possibleThirdLeg);
+                            departureTime = calculateDepartureTime(possibleThirdLeg);
                             addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                             possibleFlight.add(addedFlight);
                             return createItinerary(possibleFlight);
@@ -360,9 +360,9 @@ public class InfoRequest implements Request {
 
                         if (flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
 
-                            if (canMakeFlight(possibleLeg, nextPossibleLeg)) {
-                                arrivalTime = calculateArrivalTime(nextPossibleLeg);
-                                departureTime = calculateDepartureTime(nextPossibleLeg);
+                            if (canMakeFlight(possibleSecondLeg, possibleThirdLeg)) {
+                                arrivalTime = calculateArrivalTime(possibleThirdLeg);
+                                departureTime = calculateDepartureTime(possibleThirdLeg);
                                 addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
                                 possibleFlight.add(addedFlight);
                                 if (destOrigin.equals(requestParams.get(1))) {
@@ -399,9 +399,7 @@ public class InfoRequest implements Request {
         if (destArrival.isBefore(destDeparture)) {
             canMake =  true;
         } else if (destArrival == destDeparture) {
-            if (destArrival.isBefore(destDeparture)) {
-                canMake = true;
-            }
+            canMake = true;
         }
 
         return canMake;
