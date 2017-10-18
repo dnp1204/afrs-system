@@ -221,6 +221,7 @@ public class InfoRequest implements Request {
     public ArrayList<String> doRequest(String[] params) {
 
         ArrayList<String> itineraryListString = new ArrayList<>();
+        itineraryList.clear();
 
         if (params.length == 4) {
             setConnectionLimit(params[2]);
