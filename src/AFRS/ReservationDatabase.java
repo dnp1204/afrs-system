@@ -52,7 +52,7 @@ public class ReservationDatabase {
         StringBuffer output = new StringBuffer();
         for ( Reservation r : reservationList){
             output.append(r.toString());
-            output.append("/n");
+            output.append("\n");
         }
 
         String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
@@ -70,12 +70,14 @@ public class ReservationDatabase {
 
         // check if id is valid
         // then check if this reservation already exists
+
         try{
-            Itinerary itinerary = recentItineraryList.get(id + 1); // use id + 1 to handle 0-based array index
+            Itinerary itinerary = recentItineraryList.get(id-1); // use id-1 to handle 0-based array index
             for (Reservation r : reservationList) {
                 if (r.getPassengerName().equals(passengerName)){
                     Itinerary check_itinerary = r.getItinerary();
-                    if (check_itinerary.toString().equals(itinerary.toString())){
+                    if (check_itinerary.getOrigin().equals(itinerary.getOrigin()) &&
+                            check_itinerary.getDestination().equals(itinerary.getDestination())){
                         return "error,duplicate reservation";
 
                     }
@@ -93,12 +95,10 @@ public class ReservationDatabase {
 
         Reservation new_reservation = new Reservation();
         new_reservation.setPassengerName(passengerName);
-        new_reservation.setItinerary(recentItineraryList.get(id + 1));
-        //use id + 1 to handle the 0-based index of array
+        new_reservation.setItinerary(recentItineraryList.get(id-1));
+        //use id-1 to handle the 0-based index of array
         reservationList.add(new_reservation);
         return("reserve,successful");
-
-        //TODO; error handle duplicate reservation
     }
 
     public String delete(String passenger, String origin, String destination) {
@@ -160,7 +160,7 @@ public class ReservationDatabase {
 
     }
 
-    public void updateItineraryList(ArrayList list){
+    public void updateItineraryList(ArrayList<Itinerary> list){
         recentItineraryList = list;
     }
 }

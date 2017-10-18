@@ -224,7 +224,6 @@ public class InfoRequest implements Request {
         itineraryList.clear();
 
         if (params.length == 4) {
-            System.out.println(params[0]+" "+params[1]+" "+params[2]+" "+params[3]);
             try {
                 Integer.parseInt(params[2]);
                 if (-1 < Integer.parseInt(params[2]) &&  Integer.parseInt(params[2]) < 3) {
