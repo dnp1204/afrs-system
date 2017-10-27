@@ -22,7 +22,7 @@ public class Itinerary implements FlightComponent {
         departureTime = flightArray.get(0).getDepartureTime();
         arrivalTime = flightArray.get(flightArray.size() - 1).getArrivalTime();
 
-        flightList = flightArray;
+        flightList = new ArrayList<>(flightArray);
         airfare = calculateFlightAirfare();
         flightCount = flightList.size();
 
