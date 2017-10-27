@@ -267,40 +267,14 @@ public class InfoRequest implements Request {
         requestParams.add(params[0]);
         requestParams.add(params[1]);
 
-        String origin = requestParams.get(0);
-
-        //Loops through the whole flight list finding flights that start from the parameter origin
-        for (String flight : flightDataList) {
-
-            if (!connectionMap.containsKey(origin)) {
-                itineraryListString.add("error,unknown origin");
-                return itineraryListString;
-            } else if (!connectionMap.containsKey(params[1])) {
-                itineraryListString.add("error,unknown destination");
-                return itineraryListString;
-            }
-
-            if (flight.split(",")[0].equals(origin)) {
-
-                //If there is a flight from the origin, the calculateRoute will be call
-                //This will send the flight information to find any possible routes to destination steming from origin
-                Itinerary connectedRoute = calculateRoute(flight);
-                if (connectedRoute != null && connectedRoute.getFlightCount() <= connectionLimit + 1) {
-                    itineraryList.add(connectedRoute);
-                }
-            }
-
-        }
+        calculateRoute(new ArrayList<>(), requestParams.get(0), requestParams.get(1));
 
         sort();
 
-        int i = 0;
-        String info = "info, " + itineraryList.size();
-        itineraryListString.add(info);
+        itineraryListString.add("info, " + itineraryList.size());
 
-        for (Itinerary itin : itineraryList) {
-            i++;
-            itineraryListString.add(i + "," + itin.toString());
+        for (int i = 0; i < itineraryList.size(); i++) {
+            itineraryListString.add(i + 1 + "," + itineraryList.get(i).toString());
         }
 
         return itineraryListString;
@@ -310,122 +284,76 @@ public class InfoRequest implements Request {
     /*
     * This will handle finding all the possible routes that a flight can take from the origin
     *
-     */
+    * @params: ArrayList<Flight> possibleFlight : This is an arraylist of a possible itinerary
+    *           String origin : This is the destination of the previous flight so in turn, the
+    *                           origin of the next needed flight
+    *           String destination: This is the overall destination of the flights
+    *
+    */
 
-    private Itinerary calculateRoute(String startingFlight) {
+    public void calculateRoute(ArrayList<Flight> possibleFlight, String origin, String destination) {
 
-        ArrayList<Flight> possibleFlight = new ArrayList<>();
+        if (possibleFlight.size() > connectionLimit) { return; }
 
-        String[] flightComponents = startingFlight.split(",");
+        for (String flight : flightDataList) {
 
-        LocalTime arrivalTime = calculateArrivalTime(startingFlight);
-        LocalTime departureTime = calculateDepartureTime(startingFlight);
+            //flightComponents[0] is origin, flightComponents[1] is destination, flightComponents[2] is departure time, flightComponents[3] is arrival time, flightComponent[4] is airfare, flightComponent[5] is flight number
 
-        //flightComponents[0] is origin, flightComponents[1] is destination, flightComponents[2] is departure time, flightComponents[3] is arrival time, flightComponent[4] is airfare, flightComponent[5] is flight number
+            String[] flightComponents = flight.split(",");
+            String flightOrigin = flightComponents[0];
+            String flightDest = flightComponents[1];
+            LocalTime departureTime = calculateTime(flightComponents[2]);
+            LocalTime arrivalTime = calculateTime(flightComponents[3]);
 
-        Flight addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
-        possibleFlight.add(addedFlight);
+            Flight flightLeg = new Flight(Integer.parseInt(flightComponents[5]), flightOrigin, departureTime, flightDest, arrivalTime, Integer.parseInt(flightComponents[4]));
 
-        if (flightComponents[1].equals(requestParams.get(1))) {
-            return createItinerary(possibleFlight);
-        }
+            if (destination.equals(flightDest) && origin.equals(flightOrigin)) {
 
-        //This is the origin of the next leg of the flight that we are looking for
-        //So it is also the destination of the first leg of the flight
-        String destOrigin = flightComponents[1];
-
-        for (String possibleSecondLeg : flightDataList) {
-
-            flightComponents = possibleSecondLeg.split(",");
-
-            if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(startingFlight, possibleSecondLeg) && flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
-                arrivalTime = calculateArrivalTime(possibleSecondLeg);
-                departureTime = calculateDepartureTime(possibleSecondLeg);
-                addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
-                possibleFlight.add(addedFlight);
-                return createItinerary(possibleFlight);
-            }
-
-            if (flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
-
-                if (canMakeFlight(startingFlight, possibleSecondLeg)) {
-
-                    arrivalTime = calculateArrivalTime(possibleSecondLeg);
-                    departureTime = calculateDepartureTime(possibleSecondLeg);
-
-                    addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
-                    possibleFlight.add(addedFlight);
-                    destOrigin = flightComponents[1];
-                    startingFlight = possibleSecondLeg;
-
-                    for (String possibleThirdLeg : flightDataList) {
-
-                        flightComponents = possibleThirdLeg.split(",");
-
-                        if (flightComponents[1].equals(requestParams.get(1)) && canMakeFlight(possibleSecondLeg, possibleThirdLeg) && flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
-                            arrivalTime = calculateArrivalTime(possibleThirdLeg);
-                            departureTime = calculateDepartureTime(possibleThirdLeg);
-                            addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
-                            possibleFlight.add(addedFlight);
-                            return createItinerary(possibleFlight);
-                        }
-
-
-                        if (flightComponents[0].equals(destOrigin) && !flightComponents[1].equals(possibleFlight.get(0).getOrigin())) {
-
-                            if (canMakeFlight(possibleSecondLeg, possibleThirdLeg)) {
-                                arrivalTime = calculateArrivalTime(possibleThirdLeg);
-                                departureTime = calculateDepartureTime(possibleThirdLeg);
-                                addedFlight = new Flight(Integer.parseInt(flightComponents[5]), flightComponents[0], departureTime, flightComponents[1], arrivalTime, Integer.parseInt(flightComponents[4]));
-                                possibleFlight.add(addedFlight);
-                                if (destOrigin.equals(requestParams.get(1))) {
-                                    return createItinerary(possibleFlight);
-                                } else {
-                                    return null;
-                                }
-                            }
-                        }
-                    }
-
-                    possibleFlight.remove(possibleFlight.size() - 1);
-
+                if (possibleFlight.size() == 0 || canMakeFlight(possibleFlight.get(possibleFlight.size() - 1), flightLeg)) {
+                    possibleFlight.add(flightLeg);
+                    createItinerary(possibleFlight);
+                    possibleFlight.remove(flightLeg);
                 }
+
+            } else if (flightOrigin.equals(origin)) {
+
+                if (possibleFlight.size() == 0) {
+                    possibleFlight.add(flightLeg);
+                    calculateRoute(possibleFlight, flightDest, destination);
+                    possibleFlight.remove(flightLeg);
+                } else if (!flightLeg.getDestination().equals(possibleFlight.get(possibleFlight.size() - 1).getOrigin()) && canMakeFlight(possibleFlight.get(possibleFlight.size() - 1), flightLeg)) {
+                    possibleFlight.add(flightLeg);
+                    calculateRoute(possibleFlight, flightDest, destination);
+                    possibleFlight.remove(flightLeg);
+                }
+
             }
+
         }
 
-        return null;
-
-
-    }
-
-    private boolean canMakeFlight(String flightA, String flightB) {
-
-        String[] flightAComponents = flightA.split(",");
-        LocalTime destArrival = calculateArrivalTime(flightA);
-
-        destArrival.plusMinutes(Integer.parseInt(delayMap.get(flightAComponents[0])) + Integer.parseInt(connectionMap.get(flightAComponents[1])));
-
-        LocalTime destDeparture = calculateDepartureTime(flightB);
-
-        boolean canMake = false;
-
-        if (destArrival.isBefore(destDeparture)) {
-            canMake =  true;
-        } else if (destArrival == destDeparture) {
-            canMake = true;
-        }
-
-        return canMake;
+        return;
 
     }
 
 
-    private LocalTime calculateArrivalTime(String flight) {
+    private boolean canMakeFlight(Flight flightA, Flight flightB) {
 
+        int addedMinutes = Integer.parseInt(delayMap.get(flightA.getOrigin())) + Integer.parseInt(connectionMap.get(flightA.getDestination()));
 
-        String[] flightComponents = flight.split(",");
-        int hours = Integer.parseInt(flightComponents[3].split(":")[0]);
-        if (flightComponents[3].split(":")[1].contains("p")) {
+        LocalTime modFlightA = flightA.getArrivalTime().plusMinutes(addedMinutes);
+
+        if (modFlightA.getHour() == 0 && flightA.getArrivalTime().getHour() > 0) { return false; }
+
+        if (modFlightA.isBefore(flightB.getDepartureTime())) { return true; }
+
+        return false;
+
+    }
+
+    private LocalTime calculateTime(String time) {
+
+        int hours = Integer.parseInt(time.split(":")[0]);
+        if (time.split(":")[1].contains("p")) {
             hours += 12;
         }
 
@@ -435,41 +363,15 @@ public class InfoRequest implements Request {
             hours = 12;
         }
 
-        int minutes = Integer.parseInt(flightComponents[3].split(":")[1].substring(0, 2));
+        int minutes = Integer.parseInt(time.split(":")[1].substring(0,2));
 
-
-        LocalTime time = LocalTime.of(hours, minutes);
-
-        return time;
-
-    }
-
-    private LocalTime calculateDepartureTime(String flight) {
-
-
-        String[] flightComponents = flight.split(",");
-        int hours = Integer.parseInt(flightComponents[2].split(":")[0]);
-        if (flightComponents[2].split(":")[1].contains("p")) {
-            hours += 12;
-        }
-
-        if (hours == 12) {
-            hours = 0;
-        } else if (hours == 24) {
-            hours = 12;
-        }
-
-        int minutes = Integer.parseInt(flightComponents[2].split(":")[1].substring(0, 2));
-
-
-        LocalTime time = LocalTime.of(hours, minutes);
-
-        return time;
+        return LocalTime.of(hours, minutes);
 
     }
 
     private Itinerary createItinerary(ArrayList<Flight> flights) {
         Itinerary connectedFlight = new Itinerary(flights);
+        itineraryList.add(connectedFlight);
         return connectedFlight;
     }
 
