@@ -15,7 +15,6 @@ import java.util.Map;
 
 public class InfoRequest implements Request {
 
-    private ArrayList<String> requestParams;
     private ArrayList<String> flightDataList = new ArrayList<>();
     private Map<String, String> connectionMap = new HashMap<String, String>();
     private Map<String, String> delayMap = new HashMap<String, String>();
@@ -29,10 +28,10 @@ public class InfoRequest implements Request {
 
 
     /*
-    ** Will set the default sorter as DepartureSort unless requested
-    ** Sets default number of connections, can be changed if needed
-    ** Will read in all files and return an error if needed
-     */
+    * Will set the default sorter as DepartureSort unless requested
+    * Sets default number of connections, can be changed if needed
+    * Will read in all files and return an error if needed
+    */
     public InfoRequest(ReservationDatabase reservationDB) {
 
         this.reservationDB = reservationDB;
@@ -40,7 +39,7 @@ public class InfoRequest implements Request {
         connectionLimit = 2;
 
         if (readInFlightFile() && readInConnectionFile() && readInDelayFile()) {
-            System.out.println("Files were read in without error");
+            //System.out.println("Files were read in without error");
 
         }
 
@@ -198,7 +197,7 @@ public class InfoRequest implements Request {
     /*
     * This will call the sort function from the sorter determined
     * Will determine if no itineraries were available
-     */
+    */
 
     private void sort() {
 
@@ -262,12 +261,11 @@ public class InfoRequest implements Request {
             setConnectionLimit("2");
         }
 
-
-        requestParams = new ArrayList<>();
-        requestParams.add(params[0]);
-        requestParams.add(params[1]);
-
-        calculateRoute(new ArrayList<>(), requestParams.get(0), requestParams.get(1));
+        if (connectionMap.containsKey(params[0]) && connectionMap.containsKey(params[1])) {
+            calculateRoute(new ArrayList<>(), params[0], params[1]);
+        } else {
+            System.out.println("Did not recognize airport key");
+        }
 
         sort();
 
@@ -290,7 +288,6 @@ public class InfoRequest implements Request {
     *           String destination: This is the overall destination of the flights
     *
     */
-
     public void calculateRoute(ArrayList<Flight> possibleFlight, String origin, String destination) {
 
         if (possibleFlight.size() > connectionLimit) { return; }
@@ -307,6 +304,7 @@ public class InfoRequest implements Request {
 
             Flight flightLeg = new Flight(Integer.parseInt(flightComponents[5]), flightOrigin, departureTime, flightDest, arrivalTime, Integer.parseInt(flightComponents[4]));
 
+            //Checks to see if the destination of the new flight is the final destination and will immediately add it
             if (destination.equals(flightDest) && origin.equals(flightOrigin)) {
 
                 if (possibleFlight.size() == 0 || canMakeFlight(possibleFlight.get(possibleFlight.size() - 1), flightLeg)) {
@@ -315,12 +313,16 @@ public class InfoRequest implements Request {
                     possibleFlight.remove(flightLeg);
                 }
 
+            //Checks to see if the origin of the flight in the list of flights is the same as the dest of the previous flight
             } else if (flightOrigin.equals(origin)) {
 
+                //If there hasn't been any previous flights, it will add it
                 if (possibleFlight.size() == 0) {
                     possibleFlight.add(flightLeg);
                     calculateRoute(possibleFlight, flightDest, destination);
                     possibleFlight.remove(flightLeg);
+
+                //If there are previous flights, it will check to see that it is not going back to the one it just came from
                 } else if (!flightLeg.getDestination().equals(possibleFlight.get(possibleFlight.size() - 1).getOrigin()) && canMakeFlight(possibleFlight.get(possibleFlight.size() - 1), flightLeg)) {
                     possibleFlight.add(flightLeg);
                     calculateRoute(possibleFlight, flightDest, destination);
@@ -331,11 +333,18 @@ public class InfoRequest implements Request {
 
         }
 
-        return;
-
     }
 
 
+    /*
+    * This will check to see if the origin flight with connection and delay times, can make the departure of the next flight
+    *
+    * @parameters: Flight flightA : This is the first flight of two where the arrival time will compared where the connection and delay time will be added
+    *              Flight flightB : This is the second flight of two where the departure time will be compared
+    *
+    * @return : a boolean is return where true if flightA with delay and connection time added to arrival is before the departure time of flightB
+    *           false if it is after, or if connection time takes place over midnight
+    */
     private boolean canMakeFlight(Flight flightA, Flight flightB) {
 
         int addedMinutes = Integer.parseInt(delayMap.get(flightA.getOrigin())) + Integer.parseInt(connectionMap.get(flightA.getDestination()));
