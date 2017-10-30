@@ -27,8 +27,8 @@ public class Reservation implements Comparable<Reservation> {
         String my_origin = this.getItinerary().getOrigin();
 
 
-        /* For Ascending order*/
-        return compare_origin.compareToIgnoreCase(my_origin);
+        /* For Descending order fixed for R2 */
+        return 1-compare_origin.compareToIgnoreCase(my_origin);
 
         /* For Descending order do like this */
             //return compareage-this.studentage;
