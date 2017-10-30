@@ -1,5 +1,8 @@
 package AFRS.Model;
 
+import AFRS.Model.Flight;
+import AFRS.Model.FlightComponent;
+
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;

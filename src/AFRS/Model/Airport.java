@@ -11,6 +11,7 @@ public class Airport {
     private String name;
     private Queue<WeatherInformation> weatherTempList;
     private int delay;
+    private int connection;
 
     /**
      * constructor for airports
@@ -63,6 +64,10 @@ public class Airport {
     public void setDelay(int delay) {
         this.delay = delay;
     }
+
+    public int getConnection() { return connection; }
+
+    public void setConnection(int connection) { this.connection = connection; }
 
     /**
      * a function to add the a WeatherInformation object to the the weatherTempList

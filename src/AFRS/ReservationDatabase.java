@@ -12,7 +12,7 @@ public class ReservationDatabase {
     //this needs to read from file to populate and be persistent reservation database
     public static ArrayList<Itinerary> recentItineraryList = new ArrayList<Itinerary>();
 
-    private final String FILEPATH = "/AFRS/DATA/reservations.txt";
+    private final String FILEPATH = "/reservations.txt";
 
 
 //- startUp() : void
@@ -27,7 +27,9 @@ public class ReservationDatabase {
     public void startUp(){
         try {
             //ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
-            BufferedReader inFile = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(FILEPATH)));
+            String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+            relativePath = relativePath.substring(relativePath.indexOf(":")+2);
+            BufferedReader inFile = new BufferedReader(new FileReader(relativePath+FILEPATH));
             String inputLine;
 
             while ((inputLine = inFile.readLine()) != null) {
@@ -44,7 +46,7 @@ public class ReservationDatabase {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
     }
     //write to new txt file to save current db
