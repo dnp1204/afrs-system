@@ -1,23 +1,22 @@
 package AFRS.Requests;
 
-import AFRS.ReservationDatabase;
-import AFRS.Model.*;
-import AFRS.SortTypes.*;
+import AFRS.*;
+import AFRS.Model.Airport;
+import AFRS.Model.Flight;
+import AFRS.Model.Itinerary;
+import AFRS.SortTypes.AirfareSort;
+import AFRS.SortTypes.ArrivalTimeSort;
+import AFRS.SortTypes.DepartureTimeSort;
+import AFRS.SortTypes.ItinerarySort;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class InfoRequest implements Request {
 
-    private ArrayList<String> flightDataList = new ArrayList<>();
-    private Map<String, String> connectionMap = new HashMap<String, String>();
-    private Map<String, String> delayMap = new HashMap<String, String>();
+    private ArrayList<String> flightDataList;
+    private HashMap<String, Airport> airportMap;
 
     private ArrayList<Itinerary> itineraryList = new ArrayList<>();
 
@@ -32,127 +31,12 @@ public class InfoRequest implements Request {
     * Sets default number of connections, can be changed if needed
     * Will read in all files and return an error if needed
     */
-    public InfoRequest(ReservationDatabase reservationDB) {
-
+    public InfoRequest(ArrayList<String> flightDataList, HashMap<String, Airport> airportMap, ReservationDatabase reservationDB) {
+        this.flightDataList = flightDataList;
+        this.airportMap = airportMap;
         this.reservationDB = reservationDB;
 
         connectionLimit = 2;
-
-        if (readInFlightFile() && readInConnectionFile() && readInDelayFile()) {
-            //System.out.println("Files were read in without error");
-
-        }
-
-    }
-
-    /*
-    * Function will read in the flights that the system will be using
-    * This will be done once upon start up of system
-    * @Returns: boolean that is true if no errors were read, false if error occurred
-     */
-
-    private boolean readInFlightFile() {
-
-        String flightFileName = "/AFRS/Data/flights.txt";
-        String line;
-
-        try {
-
-            InputStreamReader fileReader = new InputStreamReader(getClass().getResourceAsStream(flightFileName));
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            while ((line = bufferedReader.readLine()) != null) {
-
-                flightDataList.add(line);
-
-            }
-
-            bufferedReader.close();
-
-
-        }
-
-        catch(IOException ioEX) {
-            System.out.println("Error reading file '" + flightFileName + "'");
-            return false;
-        }
-
-        return true;
-    }
-
-
-    /*
-    * Function will read in the connections that the system will be using to determine connections
-    * This will be done once upon start up of system
-    * @Returns: boolean that is true if no errors were caught, false if error occurred
-     */
-
-    private boolean readInConnectionFile() {
-        String connectionFileName = "/AFRS/Data/connections.txt";
-        String line = null;
-
-        try {
-
-            InputStreamReader fileReader = new InputStreamReader(getClass().getResourceAsStream(connectionFileName));
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            while ((line = bufferedReader.readLine()) != null) {
-
-                connectionMap.put(line.split(",")[0], line.split(",")[1]);
-
-            }
-
-            bufferedReader.close();
-
-
-        }
-
-        catch(IOException ioEX) {
-            System.out.println("Error reading file '" + connectionFileName + "'");
-            return false;
-        }
-
-        return true;
-    }
-
-    /*
-    * Function will read in the delays that the system will be using to determine connections
-    * This will be done once upon start up of system
-    * @Returns: boolean that is true if no errors were read, false if error occurred
-     */
-
-    private boolean readInDelayFile() {
-
-        String delayFileName = "/AFRS/Data/delays.txt";
-        String line = null;
-
-        try {
-
-            InputStreamReader fileReader = new InputStreamReader(getClass().getResourceAsStream(delayFileName));
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            while ((line = bufferedReader.readLine()) != null) {
-
-                delayMap.put(line.split(",")[0], line.split(",")[1]);
-
-            }
-
-            bufferedReader.close();
-
-
-        }
-
-        catch(FileNotFoundException noFileEx) {
-            System.out.println("Unable to read file '" + delayFileName + "'");
-            return false;
-        }
-
-        catch(IOException ioEX) {
-            System.out.println("Error reading file '" + delayFileName + "'");
-            return false;
-        }
-
-        return true;
 
     }
 
@@ -261,7 +145,7 @@ public class InfoRequest implements Request {
             setConnectionLimit("2");
         }
 
-        if (connectionMap.containsKey(params[0]) && connectionMap.containsKey(params[1])) {
+        if (airportMap.containsKey(params[0]) && airportMap.containsKey(params[1])) {
             calculateRoute(new ArrayList<>(), params[0], params[1]);
         } else {
             System.out.println("Did not recognize airport key");
@@ -347,7 +231,7 @@ public class InfoRequest implements Request {
     */
     private boolean canMakeFlight(Flight flightA, Flight flightB) {
 
-        int addedMinutes = Integer.parseInt(delayMap.get(flightA.getOrigin())) + Integer.parseInt(connectionMap.get(flightA.getDestination()));
+        int addedMinutes = airportMap.get(flightA.getOrigin()).getDelay() + airportMap.get(flightA.getDestination()).getConnection();
 
         LocalTime modFlightA = flightA.getArrivalTime().plusMinutes(addedMinutes);
 

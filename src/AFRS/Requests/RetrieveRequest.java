@@ -4,34 +4,17 @@ import AFRS.Model.Airport;
 import AFRS.Model.Reservation;
 import AFRS.ReservationDatabase;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RetrieveRequest implements Request {
 
     private ReservationDatabase reservationDB;
+    private HashMap<String, Airport> airportMap;
 
-    private ArrayList<String> airportList = new ArrayList<>();
-
-    public RetrieveRequest(ReservationDatabase reservationDB) {
+    public RetrieveRequest(HashMap<String, Airport> airportMap, ReservationDatabase reservationDB) {
+        this.airportMap = airportMap;
         this.reservationDB = reservationDB;
-        BufferedReader br;
-        String line;
-
-        // Read airport's name
-        br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/AFRS/Data/airports.txt")));
-        try {
-            line = br.readLine();
-            while (line != null) {
-                String[] airport = line.split(",");
-                airportList.add(airport[0]);
-                line = br.readLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -39,10 +22,9 @@ public class RetrieveRequest implements Request {
         //format should be passenger,origin,destination
         //needs to handle omission of origin or omission of destination
         //always sort return by origin
-        String passenger = "", origin = "", destination = "";
+        String passenger, origin, destination;
         ArrayList<Reservation> list;
         ArrayList<String> stringList = new ArrayList<>();
-        boolean sendError = true;
         switch(params.length) {
             case 1:
                 passenger = params[0];
@@ -52,12 +34,7 @@ public class RetrieveRequest implements Request {
                 passenger = params[0];
                 origin = params[1];
 
-                for (String s:
-                     airportList) {
-                    if(origin.equals(s))
-                        sendError = false;
-                }
-                if (sendError) {
+                if  (!airportMap.containsKey(origin)) {
                     stringList.add("error,unknown origin");
                     return stringList;
                 }
@@ -67,26 +44,13 @@ public class RetrieveRequest implements Request {
             case 3:
                 passenger = params[0];
                 origin = params[1];
-
-                for (String s:
-                        airportList) {
-                    if(origin.equals(s))
-                        sendError = false;
-                }
-                if (sendError && !origin.equals("")) {
+                if (!airportMap.containsKey(origin) && !origin.equals("")) {
                     stringList.add("error,unknown origin");
                     return stringList;
                 }
 
                 destination = params[2];
-
-                sendError = true;
-                for (String s:
-                        airportList) {
-                    if(destination.equals(s))
-                        sendError = false;
-                }
-                if (sendError) {
+                if (!airportMap.containsKey(destination)) {
                     stringList.add("error,unknown destination");
                     return stringList;
                 }

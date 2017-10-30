@@ -1,6 +1,6 @@
 package AFRS;
 
-import AFRS.Requests.*;
+import AFRS.RequestFactories.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,18 +8,20 @@ import java.util.HashMap;
 
 public class RequestController {
 
-    private static HashMap<String, Request> requests;
+    private static HashMap<String, RequestFactory> requestFactories;
+    private static FileHandler fileHandler;
     private static ReservationDatabase reservationDB;
 
     public RequestController() {
         reservationDB = new ReservationDatabase();
+        fileHandler = new FileHandler();
         reservationDB.startUp();
-        requests = new HashMap<>();
-        requests.put("airport", new AirportRequest());
-        requests.put("delete", new DeleteRequest(reservationDB));
-        requests.put("info", new InfoRequest(reservationDB));
-        requests.put("reserve", new ReserveRequest(reservationDB));
-        requests.put("retrieve", new RetrieveRequest(reservationDB));
+        requestFactories = new HashMap<>();
+        requestFactories.put("airport", new AirportRequestFactory());
+        requestFactories.put("delete", new DeleteRequestFactory());
+        requestFactories.put("info", new InfoRequestFactory());
+        requestFactories.put("reserve", new ReserveRequestFactory());
+        requestFactories.put("retrieve", new RetrieveRequestFactory());
     }
 
     public ArrayList<String> parse(String str) throws IOException{
@@ -38,13 +40,13 @@ public class RequestController {
             params[i-1] = requestAndParams[i];
         }
 
-        if(requests.get(request) == null) {
+        if(requestFactories.get(request) == null) {
             ArrayList<String> response = new ArrayList<>();
             response.add("error,unknown request");
             return response;
         }
 
-        return requests.get(request).doRequest(params);
+        return requestFactories.get(request).makeRequest(fileHandler, reservationDB, params);
     }
 
     private String[] safeSplit(String input) {

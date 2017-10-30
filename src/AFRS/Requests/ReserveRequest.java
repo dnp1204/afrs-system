@@ -1,5 +1,6 @@
 package AFRS.Requests;
 
+import AFRS.Requests.Request;
 import AFRS.ReservationDatabase;
 
 import java.util.ArrayList;
