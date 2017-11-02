@@ -24,6 +24,7 @@ public class InfoRequest implements Request {
     private ItinerarySort sortBy = new DepartureTimeSort();
 
     private ReservationDatabase reservationDB;
+    private String clientID;
 
 
     /*
@@ -31,10 +32,11 @@ public class InfoRequest implements Request {
     * Sets default number of connections, can be changed if needed
     * Will read in all files and return an error if needed
     */
-    public InfoRequest(ArrayList<String> flightDataList, HashMap<String, Airport> airportMap, ReservationDatabase reservationDB) {
+    public InfoRequest(ArrayList<String> flightDataList, HashMap<String, Airport> airportMap, ReservationDatabase reservationDB, String clientID) {
         this.flightDataList = flightDataList;
         this.airportMap = airportMap;
         this.reservationDB = reservationDB;
+        this.clientID = clientID;
 
         connectionLimit = 2;
 
@@ -91,7 +93,7 @@ public class InfoRequest implements Request {
 
         itineraryList = sortBy.doSort(itineraryList);
 
-        reservationDB.updateItineraryList(itineraryList);
+        reservationDB.updateItineraryList(itineraryList, clientID);
 
     }
 
