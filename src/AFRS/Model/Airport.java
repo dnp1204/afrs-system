@@ -10,7 +10,7 @@ public class Airport {
     private String code;
     private String name;
     private Queue<WeatherInformation> weatherTempList;
-    private int delay;
+    private String delay;
     private int connection;
 
     /**
@@ -52,7 +52,7 @@ public class Airport {
      * getter for the delay time of an airport
      * @return delay
      */
-    public int getDelay() {
+    public String getDelay() {
         return delay;
     }
 
@@ -61,7 +61,7 @@ public class Airport {
      * only used when parsing the from the fight delay textfile
      * @param delay - time as an int of a delay
      */
-    public void setDelay(int delay) {
+    public void setDelay(String delay) {
         this.delay = delay;
     }
 

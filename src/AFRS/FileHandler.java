@@ -2,11 +2,21 @@ package AFRS;
 
 import AFRS.Model.Airport;
 import AFRS.Model.WeatherInformation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FileHandler {
 
@@ -16,12 +26,19 @@ public class FileHandler {
     private static final String delayFile = "delays.txt";
     private static final String flightFile = "flights.txt";
     private static final String weatherFile = "weather.txt";
+    private static final String URI = "http://services.faa.gov/airport/status/";
+    private static final String FORMAT = "?format=application/xml";
 
     private HashMap<String, Airport> airportMap;
+    private HashMap<String, Airport> airportServicesMap;
     private ArrayList<String> flightDataList;
 
     public HashMap<String, Airport> getAirportMap() {
         return airportMap;
+    }
+
+    public HashMap<String, Airport> getAirportServicesMap() {
+        return airportServicesMap;
     }
 
     public ArrayList<String> getFlightDataList() {
@@ -30,9 +47,14 @@ public class FileHandler {
 
     public FileHandler() {
         airportMap = new HashMap<>();
+        airportServicesMap = new HashMap<>();
         flightDataList = new ArrayList<>();
         if (!tryBuildAirportMap()) {
             System.err.println("Unable to build airport map. Exiting program.");
+            System.exit(1);
+        }
+        if (!tryBuildAirportServicesMap()) {
+            System.err.println("Unable to build airport services map. Exiting program.");
             System.exit(1);
         }
         if (!tryBuildFlightDataList()) {
@@ -42,7 +64,99 @@ public class FileHandler {
 
     }
 
+    private boolean tryBuildAirportServicesMap() {
+        BufferedReader br;
+        String line;
+        List<String> airportCode = new ArrayList<>();
+        try {
+            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(filePath + airportFile)));
+            line = br.readLine();
+            while (line != null) {
+                String[] airport = line.split(",");
+                airportCode.add(airport[0]);
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Unable to read airport file.");
+            return false;
+        }
 
+        for (String code: airportCode) {
+            String airportUrl = URI + code + FORMAT;
+            try {
+                URL airportService = new URL(airportUrl);
+                HttpURLConnection con = (HttpURLConnection) airportService.openConnection();
+
+                con.setRequestMethod("GET");
+                con.setConnectTimeout(10000);
+                con.setReadTimeout(10000);
+
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document document = builder.parse(con.getInputStream());
+                NodeList nodeList;
+
+                // Get airport name
+                nodeList = document.getElementsByTagName("Name");
+                if (nodeList.item(0) instanceof Element) {
+                    String airportName = nodeList.item(0).getLastChild().getTextContent().trim();
+                    airportServicesMap.put(code, new Airport(code, airportName));
+                }
+
+                // Get airport delay
+                nodeList = document.getElementsByTagName("Delay");
+                if (nodeList.item(0) instanceof Element) {
+                    String isDelay = nodeList.item(0).getLastChild().getTextContent().trim();
+                    if (Boolean.parseBoolean(isDelay)) {
+                        nodeList = document.getElementsByTagName("Status");
+                        NodeList childNodeList = nodeList.item(0).getChildNodes();
+                        for (int i = 0; i < childNodeList.getLength(); i++) {
+                            Node childNode = childNodeList.item(i);
+                            if (childNode instanceof Element) {
+                                switch (childNode.getNodeName()) {
+                                    case "AvgDelay":
+                                        airportServicesMap.get(code).setDelay(childNode.getLastChild().getTextContent().trim());
+                                        break;
+
+                                }
+                            }
+                        }
+
+                    } else {
+                        airportServicesMap.get(code).setDelay("0");
+                    }
+                }
+
+                // Get weather information
+                nodeList = document.getElementsByTagName("Weather");
+                String condition = "", temperature = "";
+                for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
+                    Node node = nodeList.item(0).getChildNodes().item(i);
+                    if (node instanceof Element) {
+                        String content = node.getLastChild().getTextContent().trim();
+                        switch (node.getNodeName()) {
+                            case "Weather":
+                                condition = content;
+                                break;
+                            case "Temp":
+                                temperature = content;
+                        }
+                    }
+                }
+                WeatherInformation temp = new WeatherInformation(condition, temperature);
+                airportServicesMap.get(code).addWeatherToList(temp);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Unable to get data from webservices");
+                return false;
+            }
+
+        }
+
+        return true;
+    }
 
     private boolean tryBuildAirportMap() {
         BufferedReader br;
@@ -84,7 +198,7 @@ public class FileHandler {
             line = br.readLine();
             while (line != null) {
                 String[] airport = line.split(",");
-                airportMap.get(airport[0]).setDelay(Integer.parseInt(airport[1]));
+                airportMap.get(airport[0]).setDelay(airport[1]);
                 line = br.readLine();
             }
         } catch (Exception e) {

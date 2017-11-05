@@ -9,6 +9,6 @@ import java.util.ArrayList;
 public class AirportRequestFactory implements RequestFactory {
     @Override
     public ArrayList<String> makeRequest(FileHandler fh, ReservationDatabase rd, String[] params) {
-        return new AirportRequest(fh.getAirportMap()).doRequest(params);
+        return new AirportRequest(fh.getAirportMap(), fh.getAirportServicesMap()).doRequest(params);
     }
 }
