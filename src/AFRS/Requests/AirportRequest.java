@@ -12,14 +12,12 @@ import java.util.HashMap;
 public class AirportRequest implements Request {
 
     private HashMap<String, Airport> airportHashMap;
-    private HashMap<String, Airport> airportServicesHashMap;
 
     /**
      * constructor for AirportRequest
      */
-    public AirportRequest(HashMap<String, Airport> airportHashMap, HashMap<String, Airport> airportServicesHashMap) {
+    public AirportRequest(HashMap<String, Airport> airportHashMap) {
         this.airportHashMap = airportHashMap;
-        this.airportServicesHashMap = airportServicesHashMap;
     }
 
     /**

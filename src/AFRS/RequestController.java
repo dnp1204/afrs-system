@@ -22,6 +22,7 @@ public class RequestController {
         requestFactories.put("info", new InfoRequestFactory());
         requestFactories.put("reserve", new ReserveRequestFactory());
         requestFactories.put("retrieve", new RetrieveRequestFactory());
+        requestFactories.put("server", new ServiceRequestFactory());
     }
 
     public ArrayList<String> parse(String str) throws IOException{

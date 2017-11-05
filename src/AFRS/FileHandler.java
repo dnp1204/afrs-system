@@ -105,26 +105,19 @@ public class FileHandler {
                 }
 
                 // Get airport delay
-                nodeList = document.getElementsByTagName("Delay");
+                nodeList = document.getElementsByTagName("Status");
                 if (nodeList.item(0) instanceof Element) {
-                    String isDelay = nodeList.item(0).getLastChild().getTextContent().trim();
-                    if (Boolean.parseBoolean(isDelay)) {
-                        nodeList = document.getElementsByTagName("Status");
-                        NodeList childNodeList = nodeList.item(0).getChildNodes();
-                        for (int i = 0; i < childNodeList.getLength(); i++) {
-                            Node childNode = childNodeList.item(i);
-                            if (childNode instanceof Element) {
-                                switch (childNode.getNodeName()) {
-                                    case "AvgDelay":
-                                        airportServicesMap.get(code).setDelay(childNode.getLastChild().getTextContent().trim());
-                                        break;
-
-                                }
+                    NodeList childNodeList = nodeList.item(0).getChildNodes();
+                    for (int i = 0; i < childNodeList.getLength(); i++) {
+                        Node childNode = childNodeList.item(i);
+                        if (childNode instanceof Element && childNode.getNodeName().equals("AvgDelay")) {
+                            if (childNode.getLastChild() != null) {
+                                airportServicesMap.get(code).setDelay(childNode.getLastChild().getTextContent().trim());
+                            } else {
+                                airportServicesMap.get(code).setDelay("0");
                             }
+                            break;
                         }
-
-                    } else {
-                        airportServicesMap.get(code).setDelay("0");
                     }
                 }
 

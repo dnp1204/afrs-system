@@ -231,13 +231,13 @@ public class InfoRequest implements Request {
     */
     private boolean canMakeFlight(Flight flightA, Flight flightB) {
 
-//        int addedMinutes = airportMap.get(flightA.getOrigin()).getDelay() + airportMap.get(flightA.getDestination()).getConnection();
-//
-//        LocalTime modFlightA = flightA.getArrivalTime().plusMinutes(addedMinutes);
-//
-//        if (modFlightA.getHour() == 0 && flightA.getArrivalTime().getHour() > 0) { return false; }
-//
-//        if (modFlightA.isBefore(flightB.getDepartureTime())) { return true; }
+        int addedMinutes = Integer.parseInt(airportMap.get(flightA.getOrigin()).getDelay()) + airportMap.get(flightA.getDestination()).getConnection();
+
+        LocalTime modFlightA = flightA.getArrivalTime().plusMinutes(addedMinutes);
+
+        if (modFlightA.getHour() == 0 && flightA.getArrivalTime().getHour() > 0) { return false; }
+
+        if (modFlightA.isBefore(flightB.getDepartureTime())) { return true; }
 
         return false;
 
