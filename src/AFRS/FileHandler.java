@@ -38,10 +38,6 @@ public class FileHandler {
         return airportMap;
     }
 
-    public HashMap<String, Airport> getAirportServicesMap() {
-        return airportServicesMap;
-    }
-
     public HashMap<String, Airport> getAirportInfo() {
         return airportInfo;
     }
