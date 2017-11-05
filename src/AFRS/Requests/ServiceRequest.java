@@ -14,10 +14,11 @@ public class ServiceRequest implements Request {
     @Override
     public ArrayList<String> doRequest(String[] params) {
         ArrayList<String> result = new ArrayList<>();
-        if (params[0] != "local" && params[0] != "faa") {
+        if (!params[0].equals("local") && !params[0].equals("faa")) {
             result.add("error, unknown information server");
         } else {
             result.add("server,successful");
+            fileHandler.setAirportServicesMap(params[0]);
         }
         return result;
     }
