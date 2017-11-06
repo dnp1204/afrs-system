@@ -233,7 +233,7 @@ public class InfoRequest implements Request {
     */
     private boolean canMakeFlight(Flight flightA, Flight flightB) {
 
-        int addedMinutes = airportMap.get(flightA.getOrigin()).getDelay() + airportMap.get(flightA.getDestination()).getConnection();
+        int addedMinutes = Integer.parseInt(airportMap.get(flightA.getOrigin()).getDelay()) + airportMap.get(flightA.getDestination()).getConnection();
 
         LocalTime modFlightA = flightA.getArrivalTime().plusMinutes(addedMinutes);
 
