@@ -17,10 +17,14 @@ public class ReservationDatabase {
 
     private final String FILEPATH = "/reservations.txt";
 
-    private Map<String,Stack<ReservationWithState>> undoStackMap;//never assigned?
-    private Map<String,Stack<ReservationWithState>> redoStackMap;
+    private static Map<String,Stack<ReservationWithState>> undoStackMap;//never assigned?
+    private static Map<String,Stack<ReservationWithState>> redoStackMap;
 
     public String redo(String clientID){
+        //check if the redoStack is empty
+        if (!redoStackMap.containsKey(clientID)) {
+            return "sorry charlie, nothing to redo yet! try out some of our nifty commands...or are they requests? and then undo them";
+        }
         ReservationWithState rs = redoStackMap.get(clientID).pop();
         undoStackMap.get(clientID).push(rs);
         if (rs.getState().equals("delete")){
@@ -32,6 +36,14 @@ public class ReservationDatabase {
     }
 
     public String undo(String clientID){
+        //check if the undoStack is empty
+        if (!undoStackMap.containsKey(clientID)) {
+            return "sorry charlie, nothing to undo yet! try out some of our nifty commands...or are they requests?";
+        }
+        // create redo stack if it does not already exist
+        if (!redoStackMap.containsKey(clientID)) {
+            redoStackMap.put(clientID, new Stack<>());
+        }
         ReservationWithState rs = undoStackMap.get(clientID).pop();
         redoStackMap.get(clientID).push(rs);
         if (rs.getState().equals("delete")){
@@ -129,6 +141,25 @@ public class ReservationDatabase {
         new_reservation.setItinerary(recentItineraryList.get(id-1));
         //use id-1 to handle the 0-based index of array
         reservationList.add(new_reservation);
+
+        //TODO: Make reservations associated with client ID??????????
+        //TODO: Wait so can two clients have the same name? if so then name cannot be a constraint for reservation.
+        //TODO: get client ID in here
+
+
+        //reserve request is valid so instanciate a undo stack if one does not already exist.
+        // and reset the redo stack if one did already exist
+
+        if (!undoStackMap.containsKey(clientID)) {
+            undoStackMap.put(clientID, new Stack<>());
+        }
+        ReservationWithState rs = new ReservationWithState("reserve", new_reservation);
+        undoStackMap.get(clientID).push(rs);
+
+        //check if that client had an existing redoStack and clear it
+        if (redoStackMap.containsKey(clientID)) {
+            redoStackMap.remove(clientID);
+        }
         return("reserve,successful");
     }
 
@@ -238,7 +269,7 @@ public class ReservationDatabase {
         recentItineraryList = list;
     }
 
-    class ReservationWithState{
+    static class ReservationWithState{
         String state; // delete OR reserve - representing the INITIAL state in which this reservation was last called. This should never change!
         Reservation reservation;
         public ReservationWithState(String state, Reservation reservation){
