@@ -18,7 +18,7 @@ public class RetrieveRequest implements Request {
     }
 
     @Override
-    public ArrayList<String> doRequest(String[] params) {
+    public ArrayList<String> doRequest(String clientID, String[] params) {
         //format should be passenger,origin,destination
         //needs to handle omission of origin or omission of destination
         //always sort return by origin

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class RequestView {
+public class RequestCLI {
 
     private static final String PROMPT = "> ";
     private static Scanner scan;

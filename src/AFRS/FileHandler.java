@@ -31,22 +31,23 @@ public class FileHandler {
 
     private HashMap<String, Airport> airportMap;
     private HashMap<String, Airport> airportServicesMap;
-    private HashMap<String, Airport> airportInfo;
+    private HashMap<String, HashMap<String, Airport>> airportInfo;
     private ArrayList<String> flightDataList;
 
-    public HashMap<String, Airport> getAirportMap() {
-        return airportMap;
+    public HashMap<String, Airport> getAirportInfo(String clientID) {
+        return airportInfo.get(clientID);
     }
 
-    public HashMap<String, Airport> getAirportInfo() {
-        return airportInfo;
+    public void removeClient(String clientID) {
+        airportInfo.remove(clientID);
     }
 
-    public void setAirportServicesMap(String type) {
+    public void setAirportInfo(String clientID, String type) {
         if (type.equals("faa")) {
-           airportInfo = airportServicesMap;
+            tryBuildAirportServicesMap();
+            airportInfo.put(clientID,airportServicesMap);
         } else if (type.equals("local")){
-            airportInfo = airportMap;
+            airportInfo.put(clientID,airportMap);
         }
     }
 
@@ -55,6 +56,7 @@ public class FileHandler {
     }
 
     public FileHandler() {
+        airportInfo = new HashMap<>();
         airportMap = new HashMap<>();
         airportServicesMap = new HashMap<>();
         flightDataList = new ArrayList<>();
@@ -70,7 +72,6 @@ public class FileHandler {
             System.err.println("Unable to build flight data list. Exiting program.");
             System.exit(1);
         }
-        setAirportServicesMap("local");
     }
 
     private boolean tryBuildAirportServicesMap() {

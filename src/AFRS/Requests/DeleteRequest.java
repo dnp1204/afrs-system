@@ -14,7 +14,7 @@ public class DeleteRequest implements Request {
     }
 
     @Override
-    public ArrayList<String> doRequest(String[] params) {
+    public ArrayList<String> doRequest(String clientID, String[] params) {
         //format should passenger,origin,destination
         ArrayList<String> response = new ArrayList<>();
         if(params.length != 3) {

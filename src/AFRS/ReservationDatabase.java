@@ -6,11 +6,12 @@ import AFRS.Model.Reservation;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class ReservationDatabase {
     private static ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
     //this needs to read from file to populate and be persistent reservation database
-    public static ArrayList<Itinerary> recentItineraryList = new ArrayList<Itinerary>();
+    private static HashMap<String,ArrayList<Itinerary>> recentItineraryLists = new HashMap<>();
 
     private final String FILEPATH = "/reservations.txt";
 
@@ -22,6 +23,10 @@ public class ReservationDatabase {
 //+ retrieve(params) : ArrayList<Reservation>
 //+ updateItineraryList(ArrayList) : void
 
+
+    public void removeClient(String clientID) {
+        recentItineraryLists.remove(clientID);
+    }
 
     //try to create a db from existing text file on start up
     public void startUp(){
@@ -68,13 +73,13 @@ public class ReservationDatabase {
     //params: id (int) - the id of the itinerary form the list of recent itineraries, starting with 1.
     //        passengerName (String) - passenger name
 
-    public static String reserve(int id, String passengerName) {
+    public static String reserve(String clientID, int itineraryID, String passengerName) {
 
         // check if id is valid
         // then check if this reservation already exists
 
         try{
-            Itinerary itinerary = recentItineraryList.get(id-1); // use id-1 to handle 0-based array index
+            Itinerary itinerary = recentItineraryLists.get(clientID).get(itineraryID - 1); // use id-1 to handle 0-based array index
             for (Reservation r : reservationList) {
                 if (r.getPassengerName().equals(passengerName)){
                     Itinerary check_itinerary = r.getItinerary();
@@ -97,7 +102,7 @@ public class ReservationDatabase {
 
         Reservation new_reservation = new Reservation();
         new_reservation.setPassengerName(passengerName);
-        new_reservation.setItinerary(recentItineraryList.get(id-1));
+        new_reservation.setItinerary(recentItineraryLists.get(clientID).get(itineraryID - 1));
         //use id-1 to handle the 0-based index of array
         reservationList.add(new_reservation);
         return("reserve,successful");
@@ -162,8 +167,8 @@ public class ReservationDatabase {
 
     }
 
-    public void updateItineraryList(ArrayList<Itinerary> list){
-        recentItineraryList = list;
+    public void updateItineraryList(ArrayList<Itinerary> list, String clientID){
+        recentItineraryLists.put(clientID, list);
     }
 }
 
