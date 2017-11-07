@@ -20,15 +20,17 @@ public class FAAAirportInfo implements AirportInfo {
 
     private HashMap<String, Airport> airportServicesMap;
     private HashMap<String, Airport> airportInfoHashMap;
+    private boolean isConnected;
 
     public FAAAirportInfo(HashMap<String, Airport> airportInfoHashMap) {
         this.airportInfoHashMap = airportInfoHashMap;
         airportServicesMap = new HashMap<>();
+        isConnected = tryBuildAirportServicesMap();
     }
 
     @Override
     public HashMap<String, Airport> getInfo() {
-       if (tryBuildAirportServicesMap()) {
+       if (isConnected) {
            return airportServicesMap;
        }
        return airportInfoHashMap;
