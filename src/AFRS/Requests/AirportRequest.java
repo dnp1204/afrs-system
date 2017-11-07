@@ -29,7 +29,6 @@ public class AirportRequest implements Request {
     @Override
     public ArrayList<String> doRequest(String clientID, String[] params) {
         ArrayList<String> result = new ArrayList<>();
-
         if (airportHashMap.containsKey(params[0])) {
             result.add(airportHashMap.get(params[0]).displayAirportInfo());
         } else {

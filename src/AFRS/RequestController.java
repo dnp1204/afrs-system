@@ -23,7 +23,7 @@ public class RequestController {
         requestFactories.add(new ReservationRequestFactory());
     }
 
-    public ArrayList<String> parse(String str) throws IOException{
+    public ArrayList<String> parse(String str) {
         String input = str.substring(0, str.length() - 1);
         String[] requestAndParams = safeSplit(input);
         if(requestAndParams[0].equals("connect")) {
@@ -41,7 +41,11 @@ public class RequestController {
             return response;
         }
         if(request.equals("quit")) {
-            reservationDB.shutDown();
+            try {
+                reservationDB.shutDown();
+            } catch(IOException e) {
+                System.err.println("Error while shutting down reservation database. Data may not persist.");
+            }
 
             ArrayList<String> response = new ArrayList<>();
             response.add("quit");

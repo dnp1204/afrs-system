@@ -24,6 +24,9 @@ public class ResponseReceiver extends ScrollPane {
     }
 
     public void update() {
-        output.appendText(subject.getState());
+        for (String s:
+             subject.getState()) {
+            output.appendText(s+"\n");
+        }
     }
 }

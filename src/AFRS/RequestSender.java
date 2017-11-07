@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -15,7 +16,9 @@ public class RequestSender extends BorderPane {
     private ResponseReceiver observer;
     private RequestController parser;
     private TextArea input;
-    private String lastKeyTyped;
+    private String UUID;
+    private String request;
+    private ArrayList<String> response;
 
     public RequestSender(RequestController parser) {
         this.parser = parser;
@@ -25,33 +28,43 @@ public class RequestSender extends BorderPane {
         input.setWrapText(false);
         setCenter(input);
 
-        input.setOnKeyTyped(e -> {
-            lastKeyTyped = e.getCharacter();
-            sendKey();
-        });
+        response = parser.parse("connect;");
+        UUID = response.get(0).split(",")[1];
 
-        input.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable,
-                                Boolean oldValue, Boolean newValue) {
-                System.out.println("focus changed: " + oldValue + ", " +
-                        newValue);
-                if (!newValue) {
-                    input.requestFocus();
-                }
+        input.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                processRequest();
             }
         });
+    }
+
+    public void processRequest() {
+        request = input.getText().substring(0, input.getText().length() - 1);
+        input.setText("");
+        response = new ArrayList<>();
+        response.add("> "+request);
+        pushUpdate();
+        if (request.length() == 0 || !request.substring(request.length() - 1).equals(";")) {
+            response = new ArrayList<>();
+            response.add("partial-request");
+            pushUpdate();
+        } else {
+            response = parser.parse(UUID + "," + request);
+            String firstResponse = response.get(0).split(",", 1)[1];
+            response.set(0, firstResponse);
+            pushUpdate();
+        }
     }
 
     public void attach(ResponseReceiver observer) {
         this.observer = observer;
     }
 
-    public void sendKey() {
+    public void pushUpdate() {
         observer.update();
     }
 
-    public String getState() {
-        return lastKeyTyped;
+    public ArrayList<String> getState() {
+        return response;
     }
 }
