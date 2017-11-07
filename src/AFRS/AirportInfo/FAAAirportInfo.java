@@ -36,7 +36,6 @@ public class FAAAirportInfo implements AirportInfo {
 
     private boolean tryBuildAirportServicesMap() {
         Set<String> airportCode = airportInfoHashMap.keySet();
-
         for (String code: airportCode) {
             String airportUrl = URI + code + FORMAT;
             try {

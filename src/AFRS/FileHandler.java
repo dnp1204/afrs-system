@@ -33,7 +33,6 @@ public class FileHandler {
     private AirportInfo airportInfo;
 
     private HashMap<String, Airport> airportMap;
-    private HashMap<String, Airport> airportInfoHashMap;
     private ArrayList<String> flightDataList;
 
     public HashMap<String, Airport> getAirportMap() {
@@ -148,5 +147,4 @@ public class FileHandler {
         }
         return true;
     }
-
 }

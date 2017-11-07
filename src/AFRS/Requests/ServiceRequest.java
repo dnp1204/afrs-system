@@ -7,7 +7,7 @@ import AFRS.FileHandler;
 import java.util.ArrayList;
 
 public class ServiceRequest implements Request {
-    FileHandler fileHandler;
+    private FileHandler fileHandler;
 
     public ServiceRequest(FileHandler fileHandler) {
         this.fileHandler = fileHandler;
