@@ -7,18 +7,15 @@ import java.util.Scanner;
 public class RequestCLI {
 
     private static final String PROMPT = "> ";
-    private static Scanner scan;
-    private static ArrayList<String> response;
-    private static String input;
-    private static RequestController parser;
 
     public static void main(String[] args) {
-        scan = new Scanner(System.in);
-        parser = new RequestController();
+        Scanner scan = new Scanner(System.in);
+        ArrayList<String> response;
+        RequestController parser = new RequestController();
         System.out.println("WELCOME TO THE AIRLINE FLIGHT RESERVATION SYSTEM");
         System.out.println("PLEASE INPUT A REQUEST FOLLOWED BY A SEMICOLON");
         do {
-            input = "";
+            String input = "";
             do {
                 System.out.print(PROMPT);
                     input += scan.nextLine();

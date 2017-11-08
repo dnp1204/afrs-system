@@ -9,6 +9,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class RequestGUI extends Application {
 
@@ -32,6 +33,17 @@ public class RequestGUI extends Application {
                 final Tab tab = new GUITab("Client "+(tabs.getTabs().size() + 1), rc);
                 tabs.getTabs().add(tab);
                 tabs.getSelectionModel().select(tab);
+            }
+        });
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                try {
+                    rc.getReservationDB().shutDown();
+                } catch (Exception e) {
+                    System.err.println("Unable to write reservations to file");
+                }
             }
         });
 

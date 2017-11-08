@@ -99,6 +99,10 @@ public class RequestController {
         return initArray;
     }
 
+    public ReservationDatabase getReservationDB() {
+        return reservationDB;
+    }
+
     private String createUUID() {
         return UUID.randomUUID().toString();
     }

@@ -11,12 +11,6 @@ public class RequestSender extends BorderPane {
     private RequestController parser;
     private TextArea input;
     private String UUID;
-
-    public String getUUID() {
-        return UUID;
-    }
-
-    private String request;
     private ArrayList<String> response;
 
     public RequestSender(RequestController parser) {
@@ -37,17 +31,18 @@ public class RequestSender extends BorderPane {
         });
     }
 
-    public void processRequest() {
-        request = input.getText().substring(0, input.getText().length() - 1);
-        input.setText("");
+    private void processRequest() {
+        String request = input.getText().substring(0, input.getText().length() - 1);
         response = new ArrayList<>();
         response.add("> "+request);
         pushUpdate();
         if (request.length() == 0 || !request.substring(request.length() - 1).equals(";")) {
             response = new ArrayList<>();
             response.add("partial-request");
+            input.setText(request);
             pushUpdate();
         } else {
+            input.setText("");
             response = parser.parse(UUID + "," + request);
             if(response.get(0).contains(",")) {
                 String firstResponse = response.get(0).substring(response.get(0).indexOf(",") + 1);
@@ -61,11 +56,15 @@ public class RequestSender extends BorderPane {
         this.observer = observer;
     }
 
-    public void pushUpdate() {
+    private void pushUpdate() {
         observer.update();
     }
 
     public ArrayList<String> getState() {
         return response;
+    }
+
+    public String getUUID() {
+        return UUID;
     }
 }

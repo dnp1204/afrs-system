@@ -1,25 +1,14 @@
 package AFRS;
 
 import AFRS.AirportInfo.AirportInfo;
-import AFRS.AirportInfo.FAAAirportInfo;
 import AFRS.AirportInfo.LocalAirportInfo;
 import AFRS.Model.Airport;
 import AFRS.Model.WeatherInformation;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class FileHandler {
 

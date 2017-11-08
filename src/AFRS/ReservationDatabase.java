@@ -11,7 +11,7 @@ public class ReservationDatabase {
     //this needs to read from file to populate and be persistent reservation database
     private static HashMap<String,ArrayList<Itinerary>> recentItineraryLists = new HashMap<>();
 
-    private final String FILEPATH = "/reservations.txt";
+    private final String FILEPATH = "reservations.txt";
 
     private static HashMap<String,Stack<ReservationWithState>> undoStackMap = new HashMap<>();
     private static HashMap<String,Stack<ReservationWithState>> redoStackMap = new HashMap<>();
@@ -126,7 +126,7 @@ public class ReservationDatabase {
             }
 
         } catch (IOException e) {
-
+            System.err.println("Unable to read reservations from file");
         }
     }
 
@@ -224,7 +224,7 @@ public class ReservationDatabase {
      *
      * Note: This method does not push a request to the undoStack as that is handled by the calling function.
      */
-     public static String reserve(ReservationWithState reservationFromStack) {
+    private static String reserve(ReservationWithState reservationFromStack) {
 
         // check if id is valid
         // then check if this reservation already exists
@@ -264,7 +264,7 @@ public class ReservationDatabase {
      *  push that onto the Undo stack for the given client.
      *  Additionally, it will reset the Redo Stack.
      */
-        public String delete(String clientID, String passenger, String origin, String destination) {
+    public String delete(String clientID, String passenger, String origin, String destination) {
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 Itinerary itinerary = r.getItinerary();
@@ -300,7 +300,7 @@ public class ReservationDatabase {
      *
      * Note: This method does not push a request to the undoStack as that is handled by the calling function.
      */
-    public String delete(ReservationWithState reservationFromStack) {
+    private String delete(ReservationWithState reservationFromStack) {
         String passenger = reservationFromStack.getReservation().getPassengerName();
         Itinerary itinerary = reservationFromStack.getReservation().getItinerary();
 

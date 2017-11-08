@@ -97,7 +97,6 @@ public class FAAAirportInfo implements AirportInfo {
                 airportServicesMap.get(code).addWeatherToList(temp);
 
             } catch (Exception e) {
-                e.printStackTrace();
                 System.err.println("Unable to get data from webservices");
                 return false;
             }

@@ -23,6 +23,9 @@ public class ResponseReceiver extends ScrollPane {
         for (String s:
              subject.getState()) {
             output.appendText(s+"\n");
+            if(s.equals("quit")) {
+                System.exit(0);
+            }
         }
     }
 }
