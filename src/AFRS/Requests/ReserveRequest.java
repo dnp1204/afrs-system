@@ -13,6 +13,16 @@ public class ReserveRequest implements Request {
         this.reservationDB = reservationDB;
     }
 
+
+    /**
+     *
+     * @param clientId (String)
+     * @param params (String[]) - contains id (id of an itinerary from the most recent info request), passengerName
+     * @return error or success message
+     *
+     * This method overrides the doRequest method to handle making a new reservation. This method parses the params and
+     * calls reserve() from ReservationDB
+     */
     @Override
     public ArrayList<String> doRequest(String clientId, String[] params) {
         //params should be id,passenger

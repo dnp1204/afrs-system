@@ -13,6 +13,14 @@ public class DeleteRequest implements Request {
         this.reservationDB = reservationDB;
     }
 
+    /**
+     *
+     * @param clientID (String)
+     * @param params (String[]) - contains passenger, origin, destination
+     * @return error or success message
+     *
+     * This method overrides doRequest to handle delete requests. It parses the params and calls delete() from ReservationDB.
+     */
     @Override
     public ArrayList<String> doRequest(String clientID, String[] params) {
         //format should passenger,origin,destination

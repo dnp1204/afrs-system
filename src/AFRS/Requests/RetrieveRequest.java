@@ -17,6 +17,16 @@ public class RetrieveRequest implements Request {
         this.reservationDB = reservationDB;
     }
 
+    /**
+     *
+     * @param clientID (String)
+     * @param params (String[]) - contains passengerName, (optional) origin airport code, (optional) destination airport code
+     * @return error or success message
+     *
+     * This method overrides the doRequest to handle all 3 possible instances of a query to retrieve reservations.
+     * The params are parsed to determine what optinal inputs were provided and then reserve() is called from
+     * the ReservationDB in the required manner.
+     */
     @Override
     public ArrayList<String> doRequest(String clientID, String[] params) {
         //format should be passenger,origin,destination

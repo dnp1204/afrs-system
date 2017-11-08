@@ -24,6 +24,17 @@ public class ReservationRequestFactory implements RequestFactory {
         requests.add("undo");
     }
 
+
+    /**
+     *
+     * @param request (String) - identifies the type of Reservation request being made
+     * @param clientID (String)
+     * @param fh (FileHandler) - provides Airport information
+     * @param rd (ReservationDB) - provides necessary connection to the ReservationDB
+     * @param params (String[]) - request parameters from client
+     * @return ArrayList<String> - results of the reservation request to be displayed to client.
+     *                             Could be a list of reservations or an error or success message.
+     */
     @Override
     public ArrayList<String> makeRequest(String request, String clientID, FileHandler fh, ReservationDatabase rd, String[] params) {
         ArrayList<String> response;
