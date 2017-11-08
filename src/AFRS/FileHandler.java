@@ -1,5 +1,8 @@
 package AFRS;
 
+import AFRS.AirportInfo.AirportInfo;
+import AFRS.AirportInfo.FAAAirportInfo;
+import AFRS.AirportInfo.LocalAirportInfo;
 import AFRS.Model.Airport;
 import AFRS.Model.WeatherInformation;
 import org.w3c.dom.Document;
@@ -26,51 +29,55 @@ public class FileHandler {
     private static final String delayFile = "delays.txt";
     private static final String flightFile = "flights.txt";
     private static final String weatherFile = "weather.txt";
-    private static final String URI = "http://services.faa.gov/airport/status/";
-    private static final String FORMAT = "?format=application/xml";
+
+    private AirportInfo airportInfo;
 
     private HashMap<String, Airport> airportMap;
     private HashMap<String, Airport> airportServicesMap;
-    private HashMap<String, Airport> airportInfo;
+    private HashMap<String, HashMap<String, Airport>> airportInfo;
     private ArrayList<String> flightDataList;
 
-    public HashMap<String, Airport> getAirportMap() {
-        return airportMap;
+    public HashMap<String, Airport> getAirportInfo(String clientID) {
+        return airportInfo.get(clientID);
     }
 
-    public HashMap<String, Airport> getAirportInfo() {
-        return airportInfo;
+    public void removeClient(String clientID) {
+        airportInfo.remove(clientID);
     }
 
-    public void setAirportServicesMap(String type) {
+    public void setAirportInfo(String clientID, String type) {
         if (type.equals("faa")) {
-           airportInfo = airportServicesMap;
+            tryBuildAirportServicesMap();
+            airportInfo.put(clientID,airportServicesMap);
         } else if (type.equals("local")){
-            airportInfo = airportMap;
+            airportInfo.put(clientID,airportMap);
         }
-    }
-
     public ArrayList<String> getFlightDataList() {
         return flightDataList;
     }
 
+    public HashMap<String, Airport> getAirportInfo() {
+        return airportInfo.getInfo();
+    }
+
+    public void setAirportInfo(AirportInfo airportInfo) {
+        this.airportInfo = airportInfo;
+    }
+
     public FileHandler() {
+        airportInfo = new HashMap<>();
         airportMap = new HashMap<>();
-        airportServicesMap = new HashMap<>();
         flightDataList = new ArrayList<>();
         if (!tryBuildAirportMap()) {
             System.err.println("Unable to build airport map. Exiting program.");
             System.exit(1);
-        }
-        if (!tryBuildAirportServicesMap()) {
-            System.err.println("Unable to build airport services map. Exiting program.");
-            System.exit(1);
+        } else {
+            airportInfo = new LocalAirportInfo(airportMap);
         }
         if (!tryBuildFlightDataList()) {
             System.err.println("Unable to build flight data list. Exiting program.");
             System.exit(1);
         }
-        setAirportServicesMap("local");
     }
 
     private boolean tryBuildAirportServicesMap() {
@@ -241,5 +248,4 @@ public class FileHandler {
         }
         return true;
     }
-
 }

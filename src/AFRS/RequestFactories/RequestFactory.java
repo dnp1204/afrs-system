@@ -6,5 +6,8 @@ import AFRS.ReservationDatabase;
 import java.util.ArrayList;
 
 public interface RequestFactory {
-    public ArrayList<String> makeRequest(FileHandler fh, ReservationDatabase rd, String[] params);
+
+    ArrayList<String> makeRequest(String request, String clientID, FileHandler fh, ReservationDatabase rd, String[] params);
+
+    ArrayList<String> getRequests();
 }

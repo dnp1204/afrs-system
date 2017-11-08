@@ -14,7 +14,7 @@ public class ReserveRequest implements Request {
     }
 
     @Override
-    public ArrayList<String> doRequest(String[] params) {
+    public ArrayList<String> doRequest(String clientId, String[] params) {
         //params should be id,passenger
         int id;
         ArrayList<String> response = new ArrayList<String>();
@@ -25,7 +25,7 @@ public class ReserveRequest implements Request {
             return response;
         }
         String passenger = params[1];
-        response.add(ReservationDatabase.reserve(id, passenger));
+        response.add(ReservationDatabase.reserve(clientId, id, passenger));
         return response;
     }
 }
