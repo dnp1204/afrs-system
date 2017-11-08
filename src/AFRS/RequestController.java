@@ -12,10 +12,12 @@ public class RequestController {
     private static ArrayList<RequestFactory> requestFactories;
     private static FileHandler fileHandler;
     private static ReservationDatabase reservationDB;
+    private static ArrayList<String> clientIDs;
 
     public RequestController() {
         reservationDB = new ReservationDatabase();
         fileHandler = new FileHandler();
+        clientIDs = new ArrayList<>();
         reservationDB.startUp();
         requestFactories = new ArrayList<>();
         requestFactories.add(new AirportRequestFactory());
@@ -28,15 +30,23 @@ public class RequestController {
         String[] requestAndParams = safeSplit(input);
         if(requestAndParams[0].equals("connect")) {
             ArrayList<String> response = new ArrayList<>();
-            response.add("connect,"+createUUID());
+            String newID = createUUID();
+            clientIDs.add(newID);
+            response.add("connect,"+newID);
             return response;
         }
         String clientID = requestAndParams[0];
+        if(!clientIDs.contains(clientID)) {
+            ArrayList<String> response = new ArrayList<>();
+            response.add("error,invalid connection");
+            return response;
+        }
         String request = requestAndParams[1];
         if(request.equals("disconnect")) {
             ArrayList<String> response = new ArrayList<>();
             fileHandler.removeClient(clientID);
             reservationDB.removeClient(clientID);
+            clientIDs.remove(clientID);
             response.add(clientID+",disconnect");
             return response;
         }

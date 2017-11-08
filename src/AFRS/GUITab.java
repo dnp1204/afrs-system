@@ -1,12 +1,9 @@
 package AFRS;
 
-import AFRS.RequestSender;
-import AFRS.ResponseReceiver;
-
-import javafx.geometry.Pos;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 
 public class GUITab extends Tab {
     public GUITab(String text, RequestController rc) {
@@ -20,5 +17,12 @@ public class GUITab extends Tab {
         pane.setBottom(sender);
 
         setContent(pane);
+
+        setOnCloseRequest(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                rc.parse(sender.getUUID()+",disconnect;");
+            }
+        });
     }
 }
