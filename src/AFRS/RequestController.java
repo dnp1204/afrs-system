@@ -32,6 +32,7 @@ public class RequestController {
             ArrayList<String> response = new ArrayList<>();
             String newID = createUUID();
             clientIDs.add(newID);
+            fileHandler.setAirportInfo(newID);
             response.add("connect,"+newID);
             return response;
         }

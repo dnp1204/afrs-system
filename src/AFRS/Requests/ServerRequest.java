@@ -20,13 +20,12 @@ public class ServerRequest implements Request {
             result.add("error, unknown information server");
         } else {
             result.add("server,successful");
-            fileHandler.setAirportInfo(clientID, params[0]);
             switch (params[0]) {
                 case "local":
-                    fileHandler.setAirportInfo(new LocalAirportInfo(fileHandler.getAirportMap()));
+                    fileHandler.setAirportInfo(clientID, new LocalAirportInfo(fileHandler.getAirportMap()));
                     break;
                 case "faa":
-                    fileHandler.setAirportInfo(new FAAAirportInfo(fileHandler.getAirportMap()));
+                    fileHandler.setAirportInfo(clientID, new FAAAirportInfo(fileHandler.getAirportInfo(clientID)));
                     break;
             }
         }

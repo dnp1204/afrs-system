@@ -7,7 +7,7 @@ import AFRS.Requests.Request;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class ReservationDatabase {
@@ -17,28 +17,28 @@ public class ReservationDatabase {
 
     private final String FILEPATH = "/reservations.txt";
 
-    private static Map<String,Stack<ReservationWithState>> undoStackMap;//never assigned?
-    private static Map<String,Stack<ReservationWithState>> redoStackMap;
+    private static HashMap<String,Stack<ReservationWithState>> undoStackMap = new HashMap<>();//never assigned?
+    private static HashMap<String,Stack<ReservationWithState>> redoStackMap = new HashMap<>();
 
     public String redo(String clientID){
         //check if the redoStack is empty
         if (!redoStackMap.containsKey(clientID)) {
-            return "sorry charlie, nothing to redo yet! try out some of our nifty commands...or are they requests? and then undo them";
+            return "error,no request available";
         }
         ReservationWithState rs = redoStackMap.get(clientID).pop();
         undoStackMap.get(clientID).push(rs);
         if (rs.getState().equals("delete")){
-            return delete(rs.reservation);
+            return "redo,delete,"+delete(rs);
         }
         else {
-            return reserve(rs.reservation);
+            return "redo,reserve,"+reserve(rs);
         }
     }
 
     public String undo(String clientID){
         //check if the undoStack is empty
         if (!undoStackMap.containsKey(clientID)) {
-            return "sorry charlie, nothing to undo yet! try out some of our nifty commands...or are they requests?";
+            return "error,no requests available";
         }
         // create redo stack if it does not already exist
         if (!redoStackMap.containsKey(clientID)) {
@@ -47,10 +47,10 @@ public class ReservationDatabase {
         ReservationWithState rs = undoStackMap.get(clientID).pop();
         redoStackMap.get(clientID).push(rs);
         if (rs.getState().equals("delete")){
-            return reserve(rs.reservation);
+            return "undo,delete,"+reserve(rs);
         }
         else {
-            return delete(rs.reservation);
+            return "undo,reserve,"+delete(rs);
         }
     }
 
@@ -147,11 +147,6 @@ public class ReservationDatabase {
         //use id-1 to handle the 0-based index of array
         reservationList.add(new_reservation);
 
-        //TODO: Make reservations associated with client ID??????????
-        //TODO: Wait so can two clients have the same name? if so then name cannot be a constraint for reservation.
-        //TODO: get client ID in here
-
-
         //reserve request is valid so instanciate a undo stack if one does not already exist.
         // and reset the redo stack if one did already exist
 
@@ -168,13 +163,13 @@ public class ReservationDatabase {
         return("reserve,successful");
     }
 
-    public static String reserve(Reservation reservationFromStack) {
+    public static String reserve(ReservationWithState reservationFromStack) {
 
         // check if id is valid
         // then check if this reservation already exists
 
-        String passenger = reservationFromStack.getPassengerName();
-        Itinerary RFS_itinerary = reservationFromStack.getItinerary();
+        String passenger = reservationFromStack.getReservation().getPassengerName();
+        Itinerary RFS_itinerary = reservationFromStack.getReservation().getItinerary();
         for (Reservation r : reservationList) {
             if (r.getPassengerName().equals(passenger)){
                 Itinerary check_itinerary = r.getItinerary();
@@ -191,7 +186,7 @@ public class ReservationDatabase {
         new_reservation.setPassengerName(passenger);
         new_reservation.setItinerary(RFS_itinerary);
         reservationList.add(new_reservation);
-        return("reserve,successful");
+        return passenger+","+RFS_itinerary;
     }
 
     public String delete(String passenger, String origin, String destination) {
@@ -208,16 +203,16 @@ public class ReservationDatabase {
 
     }
 
-    public String delete(Reservation reservation) {
-        String passenger = reservation.getPassengerName();
-        Itinerary itinerary = reservation.getItinerary();
+    public String delete(ReservationWithState reservation) {
+        String passenger = reservation.getReservation().getPassengerName();
+        Itinerary itinerary = reservation.getReservation().getItinerary();
 
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 Itinerary check_itinerary = r.getItinerary();
                 if (check_itinerary.getOrigin().equals(itinerary.getOrigin()) && check_itinerary.getDestination().equals(itinerary.getDestination())){
                     reservationList.remove(r);
-                    return "delete,successful";
+                    return passenger+","+itinerary;
                 }
             }
         }
