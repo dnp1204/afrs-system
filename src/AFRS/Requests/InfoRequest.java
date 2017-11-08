@@ -24,7 +24,6 @@ public class InfoRequest implements Request {
     private ItinerarySort sortBy = new DepartureTimeSort();
 
     private ReservationDatabase reservationDB;
-    private String clientID;
 
 
     /*
@@ -32,11 +31,10 @@ public class InfoRequest implements Request {
     * Sets default number of connections, can be changed if needed
     * Will read in all files and return an error if needed
     */
-    public InfoRequest(ArrayList<String> flightDataList, HashMap<String, Airport> airportMap, ReservationDatabase reservationDB, String clientID) {
+    public InfoRequest(ArrayList<String> flightDataList, HashMap<String, Airport> airportMap, ReservationDatabase reservationDB) {
         this.flightDataList = flightDataList;
         this.airportMap = airportMap;
         this.reservationDB = reservationDB;
-        this.clientID = clientID;
 
         connectionLimit = 2;
 
@@ -85,7 +83,7 @@ public class InfoRequest implements Request {
     * Will determine if no itineraries were available
     */
 
-    private void sort() {
+    private void sort(String clientID) {
 
         if (itineraryList == null) {
             System.out.println("List is null");
@@ -94,7 +92,6 @@ public class InfoRequest implements Request {
         itineraryList = sortBy.doSort(itineraryList);
 
         reservationDB.updateItineraryList(itineraryList, clientID);
-
     }
 
     /*
@@ -103,7 +100,7 @@ public class InfoRequest implements Request {
     *  @Parameters: String[] params: these are the given parameters that have origin, destination, connection limit, and sort type
      */
 
-    public ArrayList<String> doRequest(String[] params) {
+    public ArrayList<String> doRequest(String clientID, String[] params) {
 
         ArrayList<String> itineraryListString = new ArrayList<>();
         itineraryList.clear();
@@ -153,7 +150,7 @@ public class InfoRequest implements Request {
             System.out.println("Did not recognize airport key");
         }
 
-        sort();
+        sort(clientID);
 
         itineraryListString.add("info, " + itineraryList.size());
 

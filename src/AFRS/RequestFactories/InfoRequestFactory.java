@@ -7,8 +7,20 @@ import AFRS.ReservationDatabase;
 import java.util.ArrayList;
 
 public class InfoRequestFactory implements RequestFactory {
+
+    private ArrayList<String> requests;
+
+    public InfoRequestFactory() {
+        requests = new ArrayList<>();
+        requests.add("info");
+    }
+
     @Override
-    public ArrayList<String> makeRequest(FileHandler fh, ReservationDatabase rd, String[] params) {
-        return new InfoRequest(fh.getFlightDataList(), fh.getAirportMap(), rd).doRequest(params);
+    public ArrayList<String> makeRequest(String request, String clientID, FileHandler fh, ReservationDatabase rd, String[] params) {
+        return new InfoRequest(fh.getFlightDataList(), fh.getAirportInfo(clientID), rd).doRequest(clientID, params);
+    }
+
+    public ArrayList<String> getRequests() {
+        return requests;
     }
 }

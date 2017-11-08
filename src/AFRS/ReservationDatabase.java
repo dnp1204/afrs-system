@@ -2,17 +2,58 @@ package AFRS;
 
 import AFRS.Model.Itinerary;
 import AFRS.Model.Reservation;
+import AFRS.Requests.Request;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Stack;
 
 public class ReservationDatabase {
     private static ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
     //this needs to read from file to populate and be persistent reservation database
-    public static ArrayList<Itinerary> recentItineraryList = new ArrayList<Itinerary>();
+    private static HashMap<String,ArrayList<Itinerary>> recentItineraryLists = new HashMap<>();
 
     private final String FILEPATH = "/reservations.txt";
+
+    private static HashMap<String,Stack<ReservationWithState>> undoStackMap = new HashMap<>();//never assigned?
+    private static HashMap<String,Stack<ReservationWithState>> redoStackMap = new HashMap<>();
+
+    public String redo(String clientID){
+        //check if the redoStack is empty
+        if (!redoStackMap.containsKey(clientID)) {
+            return "error,no request available";
+        }
+        ReservationWithState rs = redoStackMap.get(clientID).pop();
+        undoStackMap.get(clientID).push(rs);
+        if (rs.getState().equals("delete")){
+            return "redo,delete,"+delete(rs);
+        }
+        else {
+            return "redo,reserve,"+reserve(rs);
+        }
+    }
+
+    public String undo(String clientID){
+        //check if the undoStack is empty
+        if (!undoStackMap.containsKey(clientID)) {
+            return "error,no requests available";
+        }
+        // create redo stack if it does not already exist
+        if (!redoStackMap.containsKey(clientID)) {
+            redoStackMap.put(clientID, new Stack<>());
+        }
+        ReservationWithState rs = undoStackMap.get(clientID).pop();
+        redoStackMap.get(clientID).push(rs);
+        if (rs.getState().equals("delete")){
+            return "undo,delete,"+reserve(rs);
+        }
+        else {
+            return "undo,reserve,"+delete(rs);
+        }
+    }
+
 
 
 //- startUp() : void
@@ -21,7 +62,12 @@ public class ReservationDatabase {
 //+ delete(params) : String
 //+ retrieve(params) : ArrayList<Reservation>
 //+ updateItineraryList(ArrayList) : void
+  
 
+
+    public void removeClient(String clientID) {
+        recentItineraryLists.remove(clientID);
+    }
 
     //try to create a db from existing text file on start up
     public void startUp(){
@@ -68,13 +114,13 @@ public class ReservationDatabase {
     //params: id (int) - the id of the itinerary form the list of recent itineraries, starting with 1.
     //        passengerName (String) - passenger name
 
-    public static String reserve(int id, String passengerName) {
+    public static String reserve(String clientID, int itineraryID, String passengerName) {
 
         // check if id is valid
         // then check if this reservation already exists
 
         try{
-            Itinerary itinerary = recentItineraryList.get(id-1); // use id-1 to handle 0-based array index
+            Itinerary itinerary = recentItineraryLists.get(clientID).get(itineraryID - 1); // use id-1 to handle 0-based array index
             for (Reservation r : reservationList) {
                 if (r.getPassengerName().equals(passengerName)){
                     Itinerary check_itinerary = r.getItinerary();
@@ -97,10 +143,50 @@ public class ReservationDatabase {
 
         Reservation new_reservation = new Reservation();
         new_reservation.setPassengerName(passengerName);
-        new_reservation.setItinerary(recentItineraryList.get(id-1));
+        new_reservation.setItinerary(recentItineraryLists.get(clientID).get(itineraryID - 1));
         //use id-1 to handle the 0-based index of array
         reservationList.add(new_reservation);
+
+        //reserve request is valid so instanciate a undo stack if one does not already exist.
+        // and reset the redo stack if one did already exist
+
+        if (!undoStackMap.containsKey(clientID)) {
+            undoStackMap.put(clientID, new Stack<>());
+        }
+        ReservationWithState rs = new ReservationWithState("reserve", new_reservation);
+        undoStackMap.get(clientID).push(rs);
+
+        //check if that client had an existing redoStack and clear it
+        if (redoStackMap.containsKey(clientID)) {
+            redoStackMap.remove(clientID);
+        }
         return("reserve,successful");
+    }
+
+    public static String reserve(ReservationWithState reservationFromStack) {
+
+        // check if id is valid
+        // then check if this reservation already exists
+
+        String passenger = reservationFromStack.getReservation().getPassengerName();
+        Itinerary RFS_itinerary = reservationFromStack.getReservation().getItinerary();
+        for (Reservation r : reservationList) {
+            if (r.getPassengerName().equals(passenger)){
+                Itinerary check_itinerary = r.getItinerary();
+                if (check_itinerary.getOrigin().equals(RFS_itinerary.getOrigin()) &&
+                        check_itinerary.getDestination().equals(RFS_itinerary.getDestination())){
+                    return "error,duplicate reservation";
+
+                }
+            }
+
+        }
+
+        Reservation new_reservation = new Reservation();
+        new_reservation.setPassengerName(passenger);
+        new_reservation.setItinerary(RFS_itinerary);
+        reservationList.add(new_reservation);
+        return passenger+","+RFS_itinerary;
     }
 
     public String delete(String passenger, String origin, String destination) {
@@ -110,6 +196,23 @@ public class ReservationDatabase {
                 if (itinerary.getOrigin().equals(origin) && itinerary.getDestination().equals(destination)){
                     reservationList.remove(r);
                     return "delete,successful";
+                }
+            }
+        }
+        return "error,reservation not found";
+
+    }
+
+    public String delete(ReservationWithState reservation) {
+        String passenger = reservation.getReservation().getPassengerName();
+        Itinerary itinerary = reservation.getReservation().getItinerary();
+
+        for (Reservation r : reservationList){
+            if (r.getPassengerName().equals(passenger)){
+                Itinerary check_itinerary = r.getItinerary();
+                if (check_itinerary.getOrigin().equals(itinerary.getOrigin()) && check_itinerary.getDestination().equals(itinerary.getDestination())){
+                    reservationList.remove(r);
+                    return passenger+","+itinerary;
                 }
             }
         }
@@ -162,8 +265,23 @@ public class ReservationDatabase {
 
     }
 
-    public void updateItineraryList(ArrayList<Itinerary> list){
-        recentItineraryList = list;
+    public void updateItineraryList(ArrayList<Itinerary> list, String clientID){
+        recentItineraryLists.put(clientID, list);
+    }
+
+    static class ReservationWithState{
+        String state; // delete OR reserve - representing the INITIAL state in which this reservation was last called. This should never change!
+        Reservation reservation;
+        public ReservationWithState(String state, Reservation reservation){
+            this.reservation = reservation;
+            this.state = state;
+        }
+        public String getState(){
+            return state;
+        }
+        public Reservation getReservation(){
+            return reservation;
+        }
     }
 }
 

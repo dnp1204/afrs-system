@@ -8,43 +8,45 @@ import AFRS.Requests.RetrieveRequest;
 import AFRS.ReservationDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class ReservationRequestFactory implements RequestFactory {
-    private Stack<Request> undoStack;//never assigned?
-    private Stack<Request> redoStack;
 
-    public void redo(){
-        Request request = redoStack.pop();
-        //make a reservation request
-        undoStack.push(request);
-    }
+    private ArrayList<String> requests;
 
-    public void undo(){
-        Request request = undoStack.pop();
-        //call delete
-        redoStack.push(request);
+    public ReservationRequestFactory() {
+        requests = new ArrayList<>();
+        requests.add("delete");
+        requests.add("redo");
+        requests.add("reserve");
+        requests.add("retrieve");
+        requests.add("undo");
     }
 
     @Override
-    public ArrayList<String> makeRequest(FileHandler fh, ReservationDatabase rd, String[] params) {
-        //choose logic
-        switch (params[1]) {
+    public ArrayList<String> makeRequest(String request, String clientID, FileHandler fh, ReservationDatabase rd, String[] params) {
+        ArrayList<String> response;
+        switch(request) {
             case "retrieve":
-                return new RetrieveRequest(fh.getAirportMap(), rd).doRequest(params);
+                return new RetrieveRequest(fh.getAirportInfo(clientID), rd).doRequest(clientID, params);
             case "reserve":
-                return new ReserveRequest(rd).doRequest(params);
+                return new ReserveRequest(rd).doRequest(clientID, params);
             case "delete":
-                return new DeleteRequest(rd).doRequest(params);
+                return new DeleteRequest(rd).doRequest(clientID, params);
             case "redo":
-                redo();
-                return  null;
+                response = new ArrayList<>();
+                response.add(rd.redo(clientID));
+                return response;
             case "undo":
-                undo();
-                return null;
-            default:
-                break;
+                response = new ArrayList<>();
+                response.add(rd.undo(clientID));
+                return response;
         }
         return null;
+    }
+
+    public ArrayList<String> getRequests() {
+        return requests;
     }
 }
