@@ -19,10 +19,10 @@ public class FAAAirportInfo implements AirportInfo {
     private static final String FORMAT = "?format=application/xml";
 
     private HashMap<String, Airport> airportServicesMap;
-    private HashMap<String, Airport> airportInfoHashMap;
+    private LocalAirportInfo airportInfoHashMap;
     private boolean isConnected;
 
-    public FAAAirportInfo(HashMap<String, Airport> airportInfoHashMap) {
+    public FAAAirportInfo(LocalAirportInfo airportInfoHashMap) {
         this.airportInfoHashMap = airportInfoHashMap;
         airportServicesMap = new HashMap<>();
         isConnected = tryBuildAirportServicesMap();
@@ -33,11 +33,11 @@ public class FAAAirportInfo implements AirportInfo {
        if (isConnected) {
            return airportServicesMap;
        }
-       return airportInfoHashMap;
+       return airportInfoHashMap.getInfo();
     }
 
     private boolean tryBuildAirportServicesMap() {
-        Set<String> airportCode = airportInfoHashMap.keySet();
+        Set<String> airportCode = airportInfoHashMap.getInfo().keySet();
         for (String code: airportCode) {
             String airportUrl = URI + code + FORMAT;
             try {

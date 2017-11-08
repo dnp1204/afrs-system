@@ -25,7 +25,7 @@ public class ServerRequest implements Request {
                     fileHandler.setAirportInfo(clientID, new LocalAirportInfo(fileHandler.getAirportMap()));
                     break;
                 case "faa":
-                    fileHandler.setAirportInfo(clientID, new FAAAirportInfo(fileHandler.getAirportInfo(clientID)));
+                    fileHandler.setAirportInfo(clientID, new FAAAirportInfo(new LocalAirportInfo(fileHandler.getAirportMap())));
                     break;
             }
         }

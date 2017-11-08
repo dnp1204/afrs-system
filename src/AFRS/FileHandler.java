@@ -6,13 +6,13 @@ import AFRS.Model.Airport;
 import AFRS.Model.WeatherInformation;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FileHandler {
 
-    private static final String filePath = "./Data/";
+    private static final String filePath = "AFRS/Data/";
     private static final String airportFile = "airports.txt";
     private static final String connectionFile = "connections.txt";
     private static final String delayFile = "delays.txt";
@@ -64,7 +64,9 @@ public class FileHandler {
         BufferedReader br;
         String line;
         try {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(filePath+airportFile)));
+            String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+            relativePath = relativePath.substring(relativePath.indexOf(":")+2);
+            br = new BufferedReader(new FileReader(relativePath+filePath+airportFile));
             line = br.readLine();
             while (line != null) {
                 String[] airport = line.split(",");
@@ -72,13 +74,14 @@ public class FileHandler {
                 line = br.readLine();
             }
         } catch (Exception e) {
-            e.printStackTrace();
             System.err.println("Unable to read airport file.");
             return false;
         }
 
         try {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(filePath+weatherFile)));
+            String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+            relativePath = relativePath.substring(relativePath.indexOf(":")+2);
+            br = new BufferedReader(new FileReader(relativePath+filePath+weatherFile));
             line = br.readLine();
             while (line != null) {
                 String[] weather = line.split(",");
@@ -96,7 +99,9 @@ public class FileHandler {
         }
 
         try {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(filePath+delayFile)));
+            String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+            relativePath = relativePath.substring(relativePath.indexOf(":")+2);
+            br = new BufferedReader(new FileReader(relativePath+filePath+delayFile));
             line = br.readLine();
             while (line != null) {
                 String[] airport = line.split(",");
@@ -109,7 +114,9 @@ public class FileHandler {
         }
 
         try {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(filePath+connectionFile)));
+            String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+            relativePath = relativePath.substring(relativePath.indexOf(":")+2);
+            br = new BufferedReader(new FileReader(relativePath+filePath+connectionFile));
             line = br.readLine();
             while (line != null) {
                 String[] airport = line.split(",");
@@ -129,7 +136,9 @@ public class FileHandler {
         String line;
 
         try {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(filePath+flightFile)));
+            String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+            relativePath = relativePath.substring(relativePath.indexOf(":")+2);
+            br = new BufferedReader(new FileReader(relativePath+filePath+flightFile));
             line = br.readLine();
             while (line != null) {
                 flightDataList.add(line);
