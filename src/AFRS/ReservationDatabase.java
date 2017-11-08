@@ -2,39 +2,71 @@ package AFRS;
 
 import AFRS.Model.Itinerary;
 import AFRS.Model.Reservation;
-import AFRS.Requests.Request;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 
 public class ReservationDatabase {
-    private static ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
+    private static ArrayList<Reservation> reservationList = new ArrayList<>();
     //this needs to read from file to populate and be persistent reservation database
     private static HashMap<String,ArrayList<Itinerary>> recentItineraryLists = new HashMap<>();
 
     private final String FILEPATH = "/reservations.txt";
 
-    private static HashMap<String,Stack<ReservationWithState>> undoStackMap = new HashMap<>();//never assigned?
+    private static HashMap<String,Stack<ReservationWithState>> undoStackMap = new HashMap<>();
     private static HashMap<String,Stack<ReservationWithState>> redoStackMap = new HashMap<>();
 
+
+    //+ redo() : String
+    //+ undo() : String
+    //+ removeClient() : void
+    //+ startUp() : void
+    //+ shutDown(): void
+    //+ reserve(params) : String
+    //+ delete(params) : String
+    //+ retrieve(params) : ArrayList<Reservation>
+    //+ updateItineraryList(ArrayList) : void
+
+    /**
+     *
+     * @param clientID (String)
+     * @return error or success message
+     *
+     * This method handles "redo" command. Pop from redoStack and determine the state of the request (either delete or reserve) and
+     * executes that request through an overloaded reserve() or delete() method.
+     *
+     * Note: this method pushes the request to undoStack. Be careful to not duplicate that in the execution of the command.
+     */
     public String redo(String clientID){
         //check if the redoStack is empty
         if (!redoStackMap.containsKey(clientID)) {
             return "error,no request available";
         }
-        ReservationWithState rs = redoStackMap.get(clientID).pop();
-        undoStackMap.get(clientID).push(rs);
-        if (rs.getState().equals("delete")){
-            return "redo,delete,"+delete(rs);
+        try {
+            ReservationWithState rs = redoStackMap.get(clientID).pop();
+            undoStackMap.get(clientID).push(rs);
+            if (rs.getState().equals("delete")) {
+                return "redo,delete," + delete(rs);
+            } else {
+                return "redo,reserve," + reserve(rs);
+            }
         }
-        else {
-            return "redo,reserve,"+reserve(rs);
+        // handles empty stack
+        catch (EmptyStackException e){
+            return "error, no request available";
         }
     }
 
+    /**
+     *
+     * @param clientID
+     * @return error or success message
+     *
+     * This method handles "undo" command. Pop from undoStack and determine the state of the request (either delete or reserve) and
+     * executes the opposite request through an overloaded reserve() or delete() method.
+     *
+     * Note: this method pushes the request to redoStack. Be careful to not duplicate that in the execution of the command.
+     */
     public String undo(String clientID){
         //check if the undoStack is empty
         if (!undoStackMap.containsKey(clientID)) {
@@ -44,35 +76,37 @@ public class ReservationDatabase {
         if (!redoStackMap.containsKey(clientID)) {
             redoStackMap.put(clientID, new Stack<>());
         }
-        ReservationWithState rs = undoStackMap.get(clientID).pop();
-        redoStackMap.get(clientID).push(rs);
-        if (rs.getState().equals("delete")){
-            return "undo,delete,"+reserve(rs);
+        try {
+            ReservationWithState rs = undoStackMap.get(clientID).pop();
+            redoStackMap.get(clientID).push(rs);
+            if (rs.getState().equals("delete")) {
+                return "undo,delete," + reserve(rs);
+            } else {
+                return "undo,reserve," + delete(rs);
+            }
         }
-        else {
-            return "undo,reserve,"+delete(rs);
+        // handles empty stack
+        catch (EmptyStackException e){
+            return "error, no request available";
         }
     }
 
-
-
-//- startUp() : void
-//- shutDown(): void
-//+ reserve(params) : String
-//+ delete(params) : String
-//+ retrieve(params) : ArrayList<Reservation>
-//+ updateItineraryList(ArrayList) : void
-  
-
-
+    /**
+     *
+     * @param clientID
+     *
+     * Clears the data stored for a client who is closing their session
+     */
     public void removeClient(String clientID) {
         recentItineraryLists.remove(clientID);
     }
 
-    //try to create a db from existing text file on start up
+    /**
+     * Try to populate reservationList from existing text file on start up, loading the data from
+     * the previous session.
+     */
     public void startUp(){
         try {
-            //ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
             String relativePath = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
             relativePath = relativePath.substring(relativePath.indexOf(":")+2);
             BufferedReader inFile = new BufferedReader(new FileReader(relativePath+FILEPATH));
@@ -95,7 +129,12 @@ public class ReservationDatabase {
 
         }
     }
-    //write to new txt file to save current db
+
+    /**
+     * Write reservationList to txt file to save current data. This will be read later on startUp() allowing the
+     * system to load data from a previous session.
+     */
+
     public void shutDown() throws IOException{
         StringBuffer output = new StringBuffer();
         for ( Reservation r : reservationList){
@@ -110,9 +149,18 @@ public class ReservationDatabase {
         writer.close();
         }
 
-    //called by client to reserve an itinerary that was just queried
-    //params: id (int) - the id of the itinerary form the list of recent itineraries, starting with 1.
-    //        passengerName (String) - passenger name
+
+    /**
+     *
+     * @param clientID (String)
+     * @param itineraryID (int) - the id of the itinerary form the list of recent itineraries, starting with 1.
+     * @param passengerName (String) - passenger name
+     * @return String - error or success message
+     *
+     *  Called by client to reserve an itinerary that was just queried with info request.
+     *  When called, this method will create a ReservationWithState Object and push that onto the Undo stack.
+     *  Additionally, it will reset the Redo Stack.
+     */
 
     public static String reserve(String clientID, int itineraryID, String passengerName) {
 
@@ -134,7 +182,9 @@ public class ReservationDatabase {
             }
         }
         catch (ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
+            return "error, invalid id";
+        }
+        catch (NullPointerException e){
             return "error, invalid id";
         }
         catch (NumberFormatException e) {
@@ -147,7 +197,7 @@ public class ReservationDatabase {
         //use id-1 to handle the 0-based index of array
         reservationList.add(new_reservation);
 
-        //reserve request is valid so instanciate a undo stack if one does not already exist.
+        // reserve request is valid so instantiate a undoStack if one does not already exist.
         // and reset the redo stack if one did already exist
 
         if (!undoStackMap.containsKey(clientID)) {
@@ -163,7 +213,18 @@ public class ReservationDatabase {
         return("reserve,successful");
     }
 
-    public static String reserve(ReservationWithState reservationFromStack) {
+
+    /**
+     *
+     * @param reservationFromStack (ReservationWithState) - A reservation object obtained from undo or redo stack
+     * @return error or success message
+     *
+     * This method is only called by undo() and redo(). It is an overload of the reserve method above to accept the
+     * ReservationWithState object as input.
+     *
+     * Note: This method does not push a request to the undoStack as that is handled by the calling function.
+     */
+     public static String reserve(ReservationWithState reservationFromStack) {
 
         // check if id is valid
         // then check if this reservation already exists
@@ -189,12 +250,38 @@ public class ReservationDatabase {
         return passenger+","+RFS_itinerary;
     }
 
-    public String delete(String passenger, String origin, String destination) {
+
+
+    /**
+     *
+     * @param clientID (String)
+     * @param passenger (String) - passenger name
+     * @param origin (String) - origin airport code
+     * @param destination (String) - destination airport code
+     * @return String - error or success message
+     *
+     *  When called, this method will create a ReservationWithState Object with the "delete" state and
+     *  push that onto the Undo stack for the given client.
+     *  Additionally, it will reset the Redo Stack.
+     */
+        public String delete(String clientID, String passenger, String origin, String destination) {
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 Itinerary itinerary = r.getItinerary();
                 if (itinerary.getOrigin().equals(origin) && itinerary.getDestination().equals(destination)){
                     reservationList.remove(r);
+
+                    if (!undoStackMap.containsKey(clientID)) {
+                        undoStackMap.put(clientID, new Stack<>());
+                    }
+                    ReservationWithState rs = new ReservationWithState("delete", r);
+                    undoStackMap.get(clientID).push(rs);
+
+                    //check if that client had an existing redoStack and clear it
+                    if (redoStackMap.containsKey(clientID)) {
+                        redoStackMap.remove(clientID);
+                    }
+
                     return "delete,successful";
                 }
             }
@@ -203,9 +290,19 @@ public class ReservationDatabase {
 
     }
 
-    public String delete(ReservationWithState reservation) {
-        String passenger = reservation.getReservation().getPassengerName();
-        Itinerary itinerary = reservation.getReservation().getItinerary();
+    /**
+     *
+     * @param reservationFromStack (ReservationWithState) - A reservation object obtained from undo or redo stack
+     * @return error or success message
+     *
+     * This method is only called by undo() and redo(). It is an overload of the delete method above to accept the
+     * ReservationWithState object as input.
+     *
+     * Note: This method does not push a request to the undoStack as that is handled by the calling function.
+     */
+    public String delete(ReservationWithState reservationFromStack) {
+        String passenger = reservationFromStack.getReservation().getPassengerName();
+        Itinerary itinerary = reservationFromStack.getReservation().getItinerary();
 
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
@@ -220,8 +317,15 @@ public class ReservationDatabase {
 
     }
 
+    /**
+     *
+     * @param passenger (String) - passenger name
+     * @return temp_list (ArrayList<Reservation>) - A list of reservations for the given passenger
+     *
+     * This method handles just one parameter. It is overloaded below to handle the 2 optional parameters.
+     */
     public ArrayList<Reservation> retrieve(String passenger){
-        ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
+        ArrayList<Reservation> temp_list = new ArrayList<>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 temp_list.add(r);
@@ -230,9 +334,18 @@ public class ReservationDatabase {
         Collections.sort(temp_list);
         return temp_list;
     }
-    //how to tell if i am given just origin or just destination. It would just be a string
+
+    /**
+     *
+     * @param passenger (String) - passenger name
+     * @param airport (String) - airport code (this could be a destination or origin)
+     * @param origin (boolean) - indicator if the lone airport provided is an origin airport (false means it is a destination airport)
+     * @return temp_list (ArrayList<Reservation>) - A list of reservations for the given passenger containing the lone origin/destination airport
+     *
+     * This overloads the method to handle 2 parameters
+     */
     public ArrayList<Reservation> retrieve(String passenger, String airport, boolean origin){
-        ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
+        ArrayList<Reservation> temp_list = new ArrayList<>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 if(origin) {
@@ -251,8 +364,17 @@ public class ReservationDatabase {
 
     }
 
+    /**
+     *
+     * @param passenger (String) - passenger name
+     * @param origin (String) - origin airport code
+     * @param destination (String) - destination airport code
+     * @return temp_list (ArrayList<Reservation>) - A single reservation for the passenger with specified origin and destination
+     *
+     * This overloads the method to handle all 3 parameters
+     */
     public ArrayList<Reservation> retrieve(String passenger, String origin, String destination){
-        ArrayList<Reservation> temp_list = new ArrayList<Reservation>();
+        ArrayList<Reservation> temp_list = new ArrayList<>();
         for (Reservation r : reservationList){
             if (r.getPassengerName().equals(passenger)){
                 if (r.getItinerary().getOrigin().equals(origin) && r.getItinerary().getDestination().equals(destination)) {
@@ -265,10 +387,21 @@ public class ReservationDatabase {
 
     }
 
+    /**
+     *
+     * @param list (ArrayList<Itinerary>) - the most recent list of Itineraries generated by an info request
+     * @param clientID (String)
+     *
+     *  Updates the recentItineraryLists Hash Map with the most recent info request per client
+     */
     public void updateItineraryList(ArrayList<Itinerary> list, String clientID){
         recentItineraryLists.put(clientID, list);
     }
 
+    /**
+     * This internal class is used in the undoStack and redoStack in order to identify the state
+     * in which the reservations are added to the stack. The state will be either reserve or delete.
+     */
     static class ReservationWithState{
         String state; // delete OR reserve - representing the INITIAL state in which this reservation was last called. This should never change!
         Reservation reservation;
