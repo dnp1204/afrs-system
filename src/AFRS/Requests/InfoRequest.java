@@ -92,7 +92,6 @@ public class InfoRequest implements Request {
         itineraryList = sortBy.doSort(itineraryList);
 
         reservationDB.updateItineraryList(itineraryList, clientID);
-
     }
 
     /*

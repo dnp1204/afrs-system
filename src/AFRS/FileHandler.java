@@ -1,5 +1,8 @@
 package AFRS;
 
+import AFRS.AirportInfo.AirportInfo;
+import AFRS.AirportInfo.FAAAirportInfo;
+import AFRS.AirportInfo.LocalAirportInfo;
 import AFRS.Model.Airport;
 import AFRS.Model.WeatherInformation;
 import org.w3c.dom.Document;
@@ -26,8 +29,8 @@ public class FileHandler {
     private static final String delayFile = "delays.txt";
     private static final String flightFile = "flights.txt";
     private static final String weatherFile = "weather.txt";
-    private static final String URI = "http://services.faa.gov/airport/status/";
-    private static final String FORMAT = "?format=application/xml";
+
+    private AirportInfo airportInfo;
 
     private HashMap<String, Airport> airportMap;
     private HashMap<String, Airport> airportServicesMap;
@@ -49,24 +52,27 @@ public class FileHandler {
         } else if (type.equals("local")){
             airportInfo.put(clientID,airportMap);
         }
-    }
-
     public ArrayList<String> getFlightDataList() {
         return flightDataList;
+    }
+
+    public HashMap<String, Airport> getAirportInfo() {
+        return airportInfo.getInfo();
+    }
+
+    public void setAirportInfo(AirportInfo airportInfo) {
+        this.airportInfo = airportInfo;
     }
 
     public FileHandler() {
         airportInfo = new HashMap<>();
         airportMap = new HashMap<>();
-        airportServicesMap = new HashMap<>();
         flightDataList = new ArrayList<>();
         if (!tryBuildAirportMap()) {
             System.err.println("Unable to build airport map. Exiting program.");
             System.exit(1);
-        }
-        if (!tryBuildAirportServicesMap()) {
-            System.err.println("Unable to build airport services map. Exiting program.");
-            System.exit(1);
+        } else {
+            airportInfo = new LocalAirportInfo(airportMap);
         }
         if (!tryBuildFlightDataList()) {
             System.err.println("Unable to build flight data list. Exiting program.");
@@ -242,5 +248,4 @@ public class FileHandler {
         }
         return true;
     }
-
 }
